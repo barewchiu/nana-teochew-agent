@@ -337,15 +337,39 @@ function App() {
   const playStation = (station) => {
     setActiveStation(station);
     setPlayHint('');
+
+    // Radio / stations that prefer opening a real listen page
+    if (station.preferExternal && station.externalUrl) {
+      stopAudio();
+      setIsPlaying(false);
+      setPlayHint('正在打开电台收听页…');
+      window.open(station.externalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
     const audio = audioRef.current;
     if (!audio) return;
+
+    if (!station.audio) {
+      stopAudio();
+      setIsPlaying(false);
+      if (station.externalUrl) {
+        setPlayHint('本地音频暂无，已打开外部收听链接。');
+        window.open(station.externalUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        setPlayHint('这段节目还在准备中，阿嫲稍等。');
+        speakText(`${station.title}，马上就来陪您听。`);
+      }
+      return;
+    }
+
     stopAudio();
     audio.src = station.audio;
     setIsPlaying(true);
     audio.play().catch(() => {
       setIsPlaying(false);
       if (station.externalUrl) {
-        setPlayHint('本地唱段稍后补上。可打开外部链接听潮剧。');
+        setPlayHint('本地唱段暂时播不了，可点下方打开外部链接。');
       } else {
         setPlayHint('这段广播录音还在准备中，阿嫲稍等。');
         speakText(`${station.title}，马上就来陪您听。`);
@@ -843,14 +867,17 @@ function App() {
                     </p>
                   </div>
                 </button>
-                {station.externalUrl && activeStation?.id === station.id && !isPlaying && (
+                {station.externalUrl && (
                   <a
                     href={station.externalUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="block bg-black/20 px-5 py-3 text-center text-lg font-bold text-white underline"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    打开外部潮剧链接
+                    {station.preferExternal
+                      ? '打开在线电台'
+                      : '打开外部潮剧链接'}
                   </a>
                 )}
               </div>

@@ -20,3 +20,6 @@ submit/
 
 # Leftover empty shell from rename
 echo-of-roots/
+
+# Full-length opera masters (keep local only; deploy uses short previews)
+nana-agent/public/audio_full_local/

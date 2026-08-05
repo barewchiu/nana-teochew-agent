@@ -29,4 +29,5 @@ backend/__pycache__/
 *.sln
 submit/
 *.zip
+public/audio_full_local/
 

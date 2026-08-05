@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun",
+    "Noto Sans SC", "PingFang SC", "Microsoft YaHei", serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #fff7ed;
+  color: #7c2d12;
+}
+
+@keyframes sound-wave {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.sound-bar {
+  animation: sound-wave 0.9s ease-in-out infinite;
+  transform-origin: center;
+}

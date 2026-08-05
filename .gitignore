@@ -1,0 +1,22 @@
+# Dependencies & build
+**/node_modules/
+**/dist/
+**/.venv/
+**/__pycache__/
+*.pyc
+
+# Secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Packaging / local
+submit/
+*.zip
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# Leftover empty shell from rename
+echo-of-roots/

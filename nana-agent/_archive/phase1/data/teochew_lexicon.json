@@ -1,0 +1,605 @@
+[
+  {
+    "id": "teo_001",
+    "mandarin": "我",
+    "teochew": "瓦",
+    "colloquial": "瓦",
+    "pengim": "ua2",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_002",
+    "mandarin": "你",
+    "teochew": "汝",
+    "colloquial": "吕",
+    "pengim": "le2",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_003",
+    "mandarin": "他/她",
+    "teochew": "伊",
+    "colloquial": "伊",
+    "pengim": "i1",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_004",
+    "mandarin": "我们（不含听者）",
+    "teochew": "阮",
+    "colloquial": "软",
+    "pengim": "ng2",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_005",
+    "mandarin": "你们",
+    "teochew": "恁",
+    "colloquial": "令",
+    "pengim": "n2",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_006",
+    "mandarin": "他们",
+    "teochew": "伊人",
+    "colloquial": "伊郎",
+    "pengim": "i1 nang5",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_007",
+    "mandarin": "自己",
+    "teochew": "胶己",
+    "colloquial": "嘎该",
+    "pengim": "ga1 gi7",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_008",
+    "mandarin": "小孩",
+    "teochew": "孥仔",
+    "colloquial": "奴仔",
+    "pengim": "nou2 gian2",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_009",
+    "mandarin": "男人",
+    "teochew": "丈夫（嗒埠）",
+    "colloquial": "搭布",
+    "pengim": "da1 bou7",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_010",
+    "mandarin": "女人",
+    "teochew": "姿娘",
+    "colloquial": "资酿",
+    "pengim": "ze1 niu5",
+    "category": "人称代词",
+    "type": "word"
+  },
+  {
+    "id": "teo_011",
+    "mandarin": "爷爷",
+    "teochew": "阿公",
+    "colloquial": "阿工",
+    "pengim": "a1 gong1",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_012",
+    "mandarin": "奶奶",
+    "teochew": "阿嫲",
+    "colloquial": "阿麻",
+    "pengim": "a1 ma5",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_013",
+    "mandarin": "爸爸",
+    "teochew": "阿爸",
+    "colloquial": "阿巴",
+    "pengim": "a1 ba7",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_014",
+    "mandarin": "妈妈",
+    "teochew": "阿妈",
+    "colloquial": "阿麻",
+    "pengim": "a1 ma2",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_015",
+    "mandarin": "哥哥",
+    "teochew": "阿兄",
+    "colloquial": "阿hia",
+    "pengim": "a1 hia1",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_016",
+    "mandarin": "姐姐",
+    "teochew": "阿姐",
+    "colloquial": "阿加",
+    "pengim": "a1 zia2",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_017",
+    "mandarin": "弟弟",
+    "teochew": "阿弟",
+    "colloquial": "阿低",
+    "pengim": "a1 di7",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_018",
+    "mandarin": "妹妹",
+    "teochew": "阿妹",
+    "colloquial": "阿梅",
+    "pengim": "a1 mue7",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_019",
+    "mandarin": "外公",
+    "teochew": "外公",
+    "colloquial": "瓦工",
+    "pengim": "gua7 gong1",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_020",
+    "mandarin": "外婆",
+    "teochew": "外嫲",
+    "colloquial": "瓦麻",
+    "pengim": "gua7 ma5",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_021",
+    "mandarin": "舅舅",
+    "teochew": "阿舅",
+    "colloquial": "阿固",
+    "pengim": "a1 gu7",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_022",
+    "mandarin": "舅妈",
+    "teochew": "阿妗",
+    "colloquial": "阿金",
+    "pengim": "a1 gim7",
+    "category": "亲属称谓（口述历史高频）",
+    "type": "word"
+  },
+  {
+    "id": "teo_023",
+    "mandarin": "吃",
+    "teochew": "食",
+    "colloquial": "甲",
+    "pengim": "ziah8",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_024",
+    "mandarin": "喝",
+    "teochew": "啉",
+    "colloquial": "林",
+    "pengim": "lim1",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_025",
+    "mandarin": "说话、讲",
+    "teochew": "呾",
+    "colloquial": "担",
+    "pengim": "da3",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_026",
+    "mandarin": "看",
+    "teochew": "睇",
+    "colloquial": "胎",
+    "pengim": "toi2",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_027",
+    "mandarin": "睡觉",
+    "teochew": "夗",
+    "colloquial": "丸",
+    "pengim": "in6",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_028",
+    "mandarin": "想要",
+    "teochew": "爱",
+    "colloquial": "矮",
+    "pengim": "ain3",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_029",
+    "mandarin": "不要",
+    "teochew": "莫/迈",
+    "colloquial": "卖",
+    "pengim": "mai7",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_030",
+    "mandarin": "来",
+    "teochew": "来",
+    "colloquial": "来",
+    "pengim": "lai5",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_031",
+    "mandarin": "回去",
+    "teochew": "转",
+    "colloquial": "邓",
+    "pengim": "deng2",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_032",
+    "mandarin": "知道",
+    "teochew": "知",
+    "colloquial": "在",
+    "pengim": "zai1",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_033",
+    "mandarin": "不知道",
+    "teochew": "毋知",
+    "colloquial": "姆在",
+    "pengim": "m6 zai1",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_034",
+    "mandarin": "帮忙",
+    "teochew": "相辅",
+    "colloquial": "思呼",
+    "pengim": "sio1 hu2",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_035",
+    "mandarin": "游玩",
+    "teochew": "踢跎",
+    "colloquial": "梯妥",
+    "pengim": "tih8 to5",
+    "category": "核心动词（日常对话）",
+    "type": "word"
+  },
+  {
+    "id": "teo_036",
+    "mandarin": "好",
+    "teochew": "好",
+    "colloquial": "厚",
+    "pengim": "ho2",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_037",
+    "mandarin": "不行、不好",
+    "teochew": "孬",
+    "colloquial": "摸",
+    "pengim": "mo2",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_038",
+    "mandarin": "好看、漂亮",
+    "teochew": "雅",
+    "colloquial": "亚",
+    "pengim": "ngia2",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_039",
+    "mandarin": "很多",
+    "teochew": "济",
+    "colloquial": "载",
+    "pengim": "zoi7",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_040",
+    "mandarin": "开心",
+    "teochew": "欢喜",
+    "colloquial": "花hi",
+    "pengim": "hua1 hi2",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_041",
+    "mandarin": "寒冷",
+    "teochew": "寒",
+    "colloquial": "瓜",
+    "pengim": "gua5",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_042",
+    "mandarin": "炎热",
+    "teochew": "烧",
+    "colloquial": "修",
+    "pengim": "sio1",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_043",
+    "mandarin": "肚子饿",
+    "teochew": "肚困",
+    "colloquial": "斗坤",
+    "pengim": "dou2 kung3",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_044",
+    "mandarin": "厉害",
+    "teochew": "恶",
+    "colloquial": "哦",
+    "pengim": "oh4",
+    "category": "形容词、感受词",
+    "type": "word"
+  },
+  {
+    "id": "teo_045",
+    "mandarin": "什么",
+    "teochew": "乜个",
+    "colloquial": "米该",
+    "pengim": "mi7 gai5",
+    "category": "疑问词（AI交互必备）",
+    "type": "word"
+  },
+  {
+    "id": "teo_046",
+    "mandarin": "干什么、怎么",
+    "teochew": "做尼",
+    "colloquial": "佐尼",
+    "pengim": "zo3 ni5",
+    "category": "疑问词（AI交互必备）",
+    "type": "word"
+  },
+  {
+    "id": "teo_047",
+    "mandarin": "哪里",
+    "teochew": "底块",
+    "colloquial": "迪亏",
+    "pengim": "di7 go3",
+    "category": "疑问词（AI交互必备）",
+    "type": "word"
+  },
+  {
+    "id": "teo_048",
+    "mandarin": "谁",
+    "teochew": "底人",
+    "colloquial": "迪郎",
+    "pengim": "di7 nang5",
+    "category": "疑问词（AI交互必备）",
+    "type": "word"
+  },
+  {
+    "id": "teo_049",
+    "mandarin": "多少",
+    "teochew": "偌多",
+    "colloquial": "罗载",
+    "pengim": "lua7 zoi7",
+    "category": "疑问词（AI交互必备）",
+    "type": "word"
+  },
+  {
+    "id": "teo_050",
+    "mandarin": "粥",
+    "teochew": "糜",
+    "colloquial": "梅",
+    "pengim": "mue5",
+    "category": "生活物品名词",
+    "type": "word"
+  },
+  {
+    "id": "teo_051",
+    "mandarin": "筷子",
+    "teochew": "箸",
+    "colloquial": "滴",
+    "pengim": "de7",
+    "category": "生活物品名词",
+    "type": "word"
+  },
+  {
+    "id": "teo_052",
+    "mandarin": "房子",
+    "teochew": "厝",
+    "colloquial": "醋",
+    "pengim": "cu3",
+    "category": "生活物品名词",
+    "type": "word"
+  },
+  {
+    "id": "teo_053",
+    "mandarin": "衣服",
+    "teochew": "衫",
+    "colloquial": "三",
+    "pengim": "san1",
+    "category": "生活物品名词",
+    "type": "word"
+  },
+  {
+    "id": "teo_054",
+    "mandarin": "手机",
+    "teochew": "手机",
+    "colloquial": "休gi",
+    "pengim": "siu1 gi1",
+    "category": "生活物品名词",
+    "type": "word"
+  },
+  {
+    "id": "teo_055",
+    "mandarin": "电灯",
+    "teochew": "电火",
+    "colloquial": "丁灰",
+    "pengim": "dian7 huê2",
+    "category": "生活物品名词",
+    "type": "word"
+  },
+  {
+    "id": "teo_056",
+    "mandarin": "道路",
+    "teochew": "道",
+    "colloquial": "兜",
+    "pengim": "dou7",
+    "category": "生活物品名词",
+    "type": "word"
+  },
+  {
+    "id": "teo_057",
+    "mandarin": "你好",
+    "teochew": "汝好！",
+    "colloquial": "吕厚",
+    "pengim": "le2 ho2",
+    "category": "常用短句（采集对话模板）",
+    "type": "phrase"
+  },
+  {
+    "id": "teo_058",
+    "mandarin": "谢谢",
+    "teochew": "多谢",
+    "colloquial": "多西亚",
+    "pengim": "do1 sia7",
+    "category": "常用短句（采集对话模板）",
+    "type": "phrase"
+  },
+  {
+    "id": "teo_059",
+    "mandarin": "不好意思",
+    "teochew": "孬意思",
+    "colloquial": "摸伊瑟",
+    "pengim": "mo2 i3 se3",
+    "category": "常用短句（采集对话模板）",
+    "type": "phrase"
+  },
+  {
+    "id": "teo_060",
+    "mandarin": "再见",
+    "teochew": "再会",
+    "colloquial": "载威",
+    "pengim": "zoi7 hue3",
+    "category": "常用短句（采集对话模板）",
+    "type": "phrase"
+  },
+  {
+    "id": "teo_061",
+    "mandarin": "吃饭了吗？",
+    "teochew": "食糜未？",
+    "colloquial": "甲梅未",
+    "pengim": "ziah8 mue5 buê7",
+    "category": "常用短句（采集对话模板）",
+    "type": "phrase"
+  },
+  {
+    "id": "teo_062",
+    "mandarin": "骗子",
+    "teochew": "诓人",
+    "colloquial": "宽郎",
+    "pengim": "kuang1 nang5",
+    "category": "反诈专项词汇（匹配PPT功能C：方言反诈识别）",
+    "type": "anti_fraud"
+  },
+  {
+    "id": "teo_063",
+    "mandarin": "钱",
+    "teochew": "银",
+    "colloquial": "根",
+    "pengim": "ngang5",
+    "category": "反诈专项词汇（匹配PPT功能C：方言反诈识别）",
+    "type": "anti_fraud"
+  },
+  {
+    "id": "teo_064",
+    "mandarin": "转账、汇款",
+    "teochew": "汇银",
+    "colloquial": "回根",
+    "pengim": "hue7 ngang5",
+    "category": "反诈专项词汇（匹配PPT功能C：方言反诈识别）",
+    "type": "anti_fraud"
+  },
+  {
+    "id": "teo_065",
+    "mandarin": "假的",
+    "teochew": "假个",
+    "colloquial": "该该",
+    "pengim": "gê2 gai5",
+    "category": "反诈专项词汇（匹配PPT功能C：方言反诈识别）",
+    "type": "anti_fraud"
+  },
+  {
+    "id": "teo_066",
+    "mandarin": "不要相信",
+    "teochew": "莫信",
+    "colloquial": "卖信",
+    "pengim": "mai7 sing3",
+    "category": "反诈专项词汇（匹配PPT功能C：方言反诈识别）",
+    "type": "anti_fraud"
+  },
+  {
+    "id": "teo_067",
+    "mandarin": "打电话报警",
+    "teochew": "拍电话报警",
+    "colloquial": "帕丁瓦报金",
+    "pengim": "pah8 dian7 uê7 bo3 ging1",
+    "category": "反诈专项词汇（匹配PPT功能C：方言反诈识别）",
+    "type": "anti_fraud"
+  }
+]

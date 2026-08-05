@@ -1,0 +1,452 @@
+[
+  {
+    "id": "dlg_001",
+    "index": 1,
+    "mandarin": "你最近身体好吗？",
+    "teochew": "汝近日身体好未？",
+    "colloquial": "吕近日身泰厚未？",
+    "pengim": "le2 gin8 jit8 sing1 thai3 ho2 buê7",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_002",
+    "index": 2,
+    "mandarin": "我身体很好，不用担心。",
+    "teochew": "瓦身体真好，免挂心。",
+    "colloquial": "瓦身泰真厚，免挂心。",
+    "pengim": "ua2 sing1 thai3 zin1 ho2, bian2 gua3 sim1",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_003",
+    "index": 3,
+    "mandarin": "今天天气很不错。",
+    "teochew": "今日天气真好。",
+    "colloquial": "今仔日天时真厚。",
+    "pengim": "gai1 jit8 ti1 si5 zin1 ho2",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_004",
+    "index": 4,
+    "mandarin": "你有吃饭了吗？",
+    "teochew": "汝有食糜未？",
+    "colloquial": "吕有甲梅未？",
+    "pengim": "le2 u6 ziah8 mue5 buê7",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_005",
+    "index": 5,
+    "mandarin": "我刚刚吃过了。",
+    "teochew": "瓦头先食好了。",
+    "colloquial": "瓦桃仙甲厚咯。",
+    "pengim": "ua2 tao5 zoin1 ziah8 ho2 lo3",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_006",
+    "index": 6,
+    "mandarin": "最近睡得好不好？",
+    "teochew": "近日夗得好无？",
+    "colloquial": "近日丸得厚无？",
+    "pengim": "gin8 jit8 in6 di4 ho2 bo5",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_007",
+    "index": 7,
+    "mandarin": "夜里比较凉快，很好睡。",
+    "teochew": "暝时较凉，真好夗。",
+    "colloquial": "米时廓凉，真厚丸。",
+    "pengim": "mi5 si5 kah4 nia5, zin1 ho2 in6",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_008",
+    "index": 8,
+    "mandarin": "你有空就来坐一坐。",
+    "teochew": "汝有闲就来坐。",
+    "colloquial": "吕有闲就来坐。",
+    "pengim": "le2 u6 oin5 ziu6 lai5 za6",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_009",
+    "index": 9,
+    "mandarin": "大家最近都平安顺利。",
+    "teochew": "众人近日皆平安顺适。",
+    "colloquial": "众人近日皆平安顺西。",
+    "pengim": "zong3 nang5 gin8 jit5 gai1 ping1 uan1 sun6 sik8",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_010",
+    "index": 10,
+    "mandarin": "天气变冷了，要多穿衣服。",
+    "teochew": "天时变寒，爱加衫。",
+    "colloquial": "天时变瓜，矮加三。",
+    "pengim": "ti1 si5 bing3 gua5, ain3 ge1 san1",
+    "scene": "生活问候 1–10"
+  },
+  {
+    "id": "dlg_011",
+    "index": 11,
+    "mandarin": "我年轻的时候住在乡下。",
+    "teochew": "瓦后生时住伫乡里。",
+    "colloquial": "瓦后生时住滴乡里。",
+    "pengim": "ua2 hau6 senn1 si5 zu7 di1 hian1 li2",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_012",
+    "index": 12,
+    "mandarin": "以前的日子比较辛苦。",
+    "teochew": "以前个日子较艰苦。",
+    "colloquial": "以前该日子廓甘苦。",
+    "pengim": "i2 zoin5 gai5 jit8 zi2 kah4 gan1 kou2",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_013",
+    "index": 13,
+    "mandarin": "小时候经常帮忙家里干活。",
+    "teochew": "孥仔时定定相辅家里做工。",
+    "colloquial": "奴仔时定定思呼厝内做工。",
+    "pengim": "nou2 gian2 si5 dian6 dian6 sio1 hu2 cu3 lai6 zo3 gang1",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_014",
+    "index": 14,
+    "mandarin": "我很想念以前的老朋友。",
+    "teochew": "瓦真挂念以前个旧朋友。",
+    "colloquial": "瓦真挂念以前该旧朋友。",
+    "pengim": "ua2 zin1 gua3 niam7 i2 zoin5 gai5 gu6 ping5 iu2",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_015",
+    "index": 15,
+    "mandarin": "我们一家人感情很好。",
+    "teochew": "阮一家人感情真好。",
+    "colloquial": "软一家人感情真厚。",
+    "pengim": "ng2 zek8 gai1 nang5 gan2 zing4 zin1 ho2",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_016",
+    "index": 16,
+    "mandarin": "孩子长大了就懂事了。",
+    "teochew": "孥仔大汉就知理。",
+    "colloquial": "奴仔大唤就知理。",
+    "pengim": "nou2 gian2 dua7 huan5 ziu6 zai1 li2",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_017",
+    "index": 17,
+    "mandarin": "以前大家都是讲潮汕话。",
+    "teochew": "以前众人拢是呾潮汕话。",
+    "colloquial": "以前众人拢是担潮汕话。",
+    "pengim": "i2 zoin5 zong3 nang5 long2 si6 da3 dio5 suan1 uê7",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_018",
+    "index": 18,
+    "mandarin": "现在的生活比以前好很多。",
+    "teochew": "现在个生活比以前济好。",
+    "colloquial": "现在该生活比以前载厚。",
+    "pengim": "hian6 zai1 gai5 sing1 huah8 pi2 i2 zoin5 zoi7 ho2",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_019",
+    "index": 19,
+    "mandarin": "每逢过节家里都很热闹。",
+    "teochew": "逢过节厝内真闹热。",
+    "colloquial": "逢过节厝内真闹热。",
+    "pengim": "hong5 guo3 zoi3 cu3 lai6 zin1 nau7 jiah8",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_020",
+    "index": 20,
+    "mandarin": "我记得很多小时候的事情。",
+    "teochew": "瓦记济孥仔时个代志。",
+    "colloquial": "瓦记载奴仔时该代志。",
+    "pengim": "ua2 gi3 zoi7 nou2 gian2 si5 gai5 dai7 zi3",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_021",
+    "index": 21,
+    "mandarin": "家乡的味道我永远记得。",
+    "teochew": "乡里个味道瓦永远记牢。",
+    "colloquial": "乡里该味道瓦永远记牢。",
+    "pengim": "hian1 li2 gai5 bi7 dau7 ua2 ing2 uan2 gi3 liau5",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_022",
+    "index": 22,
+    "mandarin": "兄弟姐妹从小一起长大。",
+    "teochew": "兄姐小弟小妹做阵大汉。",
+    "colloquial": "阿加小弟小妹做阵大唤。",
+    "pengim": "hia1 zia2 sio2 di7 sio2 mue7 zo3 dung6 dua7 huan5",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_023",
+    "index": 23,
+    "mandarin": "以前没有手机，日子很单纯。",
+    "teochew": "以前无手机，日子真单纯。",
+    "colloquial": "以前无休gi，日子真单纯。",
+    "pengim": "i2 zoin5 bo5 siu1 gi1, jit8 zi2 zin1 dan1 sun5",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_024",
+    "index": 24,
+    "mandarin": "长辈的话要好好听。",
+    "teochew": "长辈个话爱好好听。",
+    "colloquial": "长辈该话矮厚厚听。",
+    "pengim": "zang2 buê2 gai5 uê7 ain3 ho2 ho2 tian1",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_025",
+    "index": 25,
+    "mandarin": "一家人平安就是福气。",
+    "teochew": "一家人平安就是福气。",
+    "colloquial": "一家人平安就是福气。",
+    "pengim": "zek8 gai1 nang5 ping1 uan1 ziu6 si6 hok8 ki3",
+    "scene": "家庭回忆 11–25"
+  },
+  {
+    "id": "dlg_026",
+    "index": 26,
+    "mandarin": "你今天想要聊什么？",
+    "teochew": "汝今日爱呾乜个？",
+    "colloquial": "吕今仔日矮担米该？",
+    "pengim": "le2 gai1 jit8 ain3 da3 mi7 gai5",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_027",
+    "index": 27,
+    "mandarin": "我想和你聊以前的故事。",
+    "teochew": "瓦爱甲汝呾以前个古。",
+    "colloquial": "瓦矮甲吕担以前该古。",
+    "pengim": "ua2 ain3 gab8 le2 da3 i2 zoin5 gai5 gu2",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_028",
+    "index": 28,
+    "mandarin": "你听得懂潮汕话吗？",
+    "teochew": "汝听得潮语无？",
+    "colloquial": "吕听地潮语无？",
+    "pengim": "le2 tian1 di4 dio5 gi2 bo5",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_029",
+    "index": 29,
+    "mandarin": "我慢慢说，你认真听。",
+    "teochew": "瓦慢慢呾，汝认真听。",
+    "colloquial": "瓦慢慢担，吕认真听。",
+    "pengim": "ua2 ban7 ban7 da3, le2 zing6 gin1 tian1",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_030",
+    "index": 30,
+    "mandarin": "这个词语我教你怎么说。",
+    "teochew": "即个词语瓦教汝做尼呾。",
+    "colloquial": "兹个词语瓦教吕佐尼担。",
+    "pengim": "zik8 gai5 su2 ghu5 ua2 ga3 le2 zo3 ni5 da3",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_031",
+    "index": 31,
+    "mandarin": "你学得很快。",
+    "teochew": "汝学真好。",
+    "colloquial": "吕学真厚。",
+    "pengim": "le2 oh8 zin1 ho2",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_032",
+    "index": 32,
+    "mandarin": "我再说一次你听听看。",
+    "teochew": "瓦再呾一遍汝听。",
+    "colloquial": "瓦再担一遍吕听。",
+    "pengim": "ua2 zai3 da3 zek8 pian7 le2 tian1",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_033",
+    "index": 33,
+    "mandarin": "这样讲就对了。",
+    "teochew": "安尼呾就对。",
+    "colloquial": "安尼担就对。",
+    "pengim": "an1 ni1 da3 ziu6 dui3",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_034",
+    "index": 34,
+    "mandarin": "你还有什么想要问的？",
+    "teochew": "汝犹有乜个爱问？",
+    "colloquial": "吕犹有米该矮问？",
+    "pengim": "le2 iu1 u6 mi7 gai5 ain3 mung7",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_035",
+    "index": 35,
+    "mandarin": "我今天心情很好。",
+    "teochew": "瓦今日心情真好。",
+    "colloquial": "瓦今仔日心情真厚。",
+    "pengim": "ua2 gai1 jit8 sim1 zing5 zin1 ho2",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_036",
+    "index": 36,
+    "mandarin": "没事，我不要紧。",
+    "teochew": "无事，瓦无要紧。",
+    "colloquial": "无事，瓦无要紧。",
+    "pengim": "bo5 zai7, ua2 bo5 i3 gin2",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_037",
+    "index": 37,
+    "mandarin": "辛苦你了，多谢陪伴。",
+    "teochew": "辛苦汝，多谢相伴。",
+    "colloquial": "辛苦吕，多西亚相伴。",
+    "pengim": "xing1 kou2 le2, do1 sia7 sian1 puan7",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_038",
+    "index": 38,
+    "mandarin": "我们继续聊好不好？",
+    "teochew": "阮继续呾好无？",
+    "colloquial": "软继续担厚无？",
+    "pengim": "ng2 gi3 zog8 da3 ho2 bo5",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_039",
+    "index": 39,
+    "mandarin": "这句潮汕话很地道。",
+    "teochew": "即句潮语真正统。",
+    "colloquial": "兹句潮语真正统。",
+    "pengim": "zik8 gu3 dio5 gi2 zin1 tong2 hong2",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_040",
+    "index": 40,
+    "mandarin": "我很喜欢讲家乡话。",
+    "teochew": "瓦真爱呾乡里话。",
+    "colloquial": "瓦真爱担乡里话。",
+    "pengim": "ua2 zin1 ai3 da3 hian1 li2 uê7",
+    "scene": "日常互动问答 26–40"
+  },
+  {
+    "id": "dlg_041",
+    "index": 41,
+    "mandarin": "陌生电话不要随便相信。",
+    "teochew": "生份电话莫随便信。",
+    "colloquial": "生份电瓦卖随变信。",
+    "pengim": "senn1 hung7 dian7 uê7 mai7 zui5 bian3 sing3",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_042",
+    "index": 42,
+    "mandarin": "不要轻易给别人转钱。",
+    "teochew": "莫轻心汇银分人。",
+    "colloquial": "卖轻心回根分郎。",
+    "pengim": "mai7 king1 sim1 hue7 ngang5 bun1 nang5",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_043",
+    "index": 43,
+    "mandarin": "骗子的话千万不要听。",
+    "teochew": "诓人话千万莫听。",
+    "colloquial": "宽郎话千万卖听。",
+    "pengim": "kuang1 nang5 uê7 cuan1 bnua7 mai7 tian1",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_044",
+    "index": 44,
+    "mandarin": "遇到奇怪的事要多问家人。",
+    "teochew": "拄着奇怪代志爱问家人。",
+    "colloquial": "拄着奇怪代志矮问家人。",
+    "pengim": "du2 dio8 ki5 guai7 dai7 zi3 ain3 mung7 ge1 nang5",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_045",
+    "index": 45,
+    "mandarin": "网上的消息不一定是真的。",
+    "teochew": "网络消息未必是真。",
+    "colloquial": "网络消息未必是真。",
+    "pengim": "mung5 lok8 siau1 sek8 bue7 bit8 si6 zin1",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_046",
+    "index": 46,
+    "mandarin": "有人叫你汇款一定要小心。",
+    "teochew": "有人叫汝汇银着细心。",
+    "colloquial": "有郎叫吕回根着细心。",
+    "pengim": "u6 nang5 gio3 le2 hue7 ngang5 dioh8 sai3 sim1",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_047",
+    "index": 47,
+    "mandarin": "不清楚的事情不要乱做。",
+    "teochew": "毋知清个代志莫乱做。",
+    "colloquial": "姆知清该代志卖乱佐。",
+    "pengim": "m6 zai1 cing1 gai5 dai7 zi3 mai7 luan7 zo3",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_048",
+    "index": 48,
+    "mandarin": "保护自己，不要被人欺骗。",
+    "teochew": "护胶己，莫分人诓。",
+    "colloquial": "护嘎该，卖分郎宽。",
+    "pengim": "ho7 ga1 gi7, mai7 bun1 nang5 kuang1",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_049",
+    "index": 49,
+    "mandarin": "平安健康比什么都重要。",
+    "teochew": "平安健康比乜个拢重要。",
+    "colloquial": "平安健康比米该拢重要。",
+    "pengim": "ping1 uan1 gian1 kang1 pi2 mi7 gai5 long2 zing3 iau7",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  },
+  {
+    "id": "dlg_050",
+    "index": 50,
+    "mandarin": "有问题就和家人商量。",
+    "teochew": "有问题就甲家人参详。",
+    "colloquial": "有问题就甲家人参详。",
+    "pengim": "u6 bun7 tai5 ziu6 gab8 ge1 nang5 cam1 sian5",
+    "scene": "安全反诈＋温馨提醒 41–50"
+  }
+]

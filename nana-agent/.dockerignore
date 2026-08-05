@@ -1,0 +1,11 @@
+.dockerignore
+node_modules
+backend/.venv
+dist
+.git
+.env
+.env.*
+!.env.example
+_archive
+*.log
+.DS_Store

@@ -1,0 +1,13 @@
+# Render Blueprint — Docker one-URL deploy
+services:
+  - type: web
+    name: nana-teochew-agent
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false

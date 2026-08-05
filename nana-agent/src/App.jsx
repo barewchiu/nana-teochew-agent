@@ -105,6 +105,7 @@ function App() {
   const [turnIndex, setTurnIndex] = useState(0);
   const [activeMsg, setActiveMsg] = useState(null);
   const [activeStation, setActiveStation] = useState(null);
+  const [activeClip, setActiveClip] = useState(null);
   const [showReminder, setShowReminder] = useState(false);
   const [playHint, setPlayHint] = useState('');
 
@@ -283,6 +284,7 @@ function App() {
     setPendingReply(null);
     setActiveMsg(null);
     setActiveStation(null);
+    setActiveClip(null);
     setPlayHint('');
   };
 
@@ -331,49 +333,56 @@ function App() {
     stopAudio();
     setMode('OPERA');
     setActiveStation(null);
+    setActiveClip(null);
     setPlayHint('');
   };
 
-  const playStation = (station) => {
-    setActiveStation(station);
+  const openStation = (station) => {
     setPlayHint('');
-
-    // Radio / stations that prefer opening a real listen page
     if (station.preferExternal && station.externalUrl) {
+      setActiveStation(station);
+      setActiveClip(null);
       stopAudio();
       setIsPlaying(false);
       setPlayHint('正在打开电台收听页…');
       window.open(station.externalUrl, '_blank', 'noopener,noreferrer');
       return;
     }
-
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (!station.audio) {
+    if (station.clips?.length) {
       stopAudio();
       setIsPlaying(false);
-      if (station.externalUrl) {
-        setPlayHint('本地音频暂无，已打开外部收听链接。');
-        window.open(station.externalUrl, '_blank', 'noopener,noreferrer');
-      } else {
-        setPlayHint('这段节目还在准备中，阿嫲稍等。');
-        speakText(`${station.title}，马上就来陪您听。`);
-      }
+      setActiveStation(station);
+      setActiveClip(null);
       return;
     }
+    // Fallback: single audio
+    setActiveStation(station);
+    setActiveClip(null);
+    if (station.audio) {
+      playAudioFile(station.audio);
+    } else if (station.externalUrl) {
+      window.open(station.externalUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
 
+  const backToOperaList = () => {
     stopAudio();
-    audio.src = station.audio;
+    setActiveStation(null);
+    setActiveClip(null);
+    setPlayHint('');
+  };
+
+  const playClip = (clip) => {
+    setActiveClip(clip);
+    setPlayHint('');
+    const audio = audioRef.current;
+    if (!audio || !clip?.audio) return;
+    stopAudio();
+    audio.src = clip.audio;
     setIsPlaying(true);
     audio.play().catch(() => {
       setIsPlaying(false);
-      if (station.externalUrl) {
-        setPlayHint('本地唱段暂时播不了，可点下方打开外部链接。');
-      } else {
-        setPlayHint('这段广播录音还在准备中，阿嫲稍等。');
-        speakText(`${station.title}，马上就来陪您听。`);
-      }
+      setPlayHint('这段暂时播不了，请再试一次或打开外部链接。');
     });
   };
 
@@ -840,55 +849,113 @@ function App() {
       {/* OPERA */}
       {mode === 'OPERA' && (
         <main className="mx-auto w-full max-w-lg flex-1">
-          <p className="mb-4 text-center text-xl font-semibold text-nana-ink/80">
-            点一张卡片，小管家帮您开戏
-          </p>
-          <div className="space-y-4">
-            {operaStations.map((station) => (
-              <div
-                key={station.id}
-                className={`overflow-hidden rounded-3xl bg-gradient-to-br ${station.color} p-1 shadow-xl`}
+          {activeStation?.clips?.length ? (
+            <>
+              <button
+                type="button"
+                onClick={backToOperaList}
+                className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-5 py-2 text-lg font-bold text-nana-ink shadow"
               >
-                <button
-                  type="button"
-                  onClick={() => playStation(station)}
-                  className="flex w-full items-center gap-4 rounded-[1.35rem] bg-white/10 px-5 py-6 text-left text-white backdrop-blur-sm transition-transform active:scale-[0.98]"
-                >
-                  <div className="rounded-2xl bg-white/20 p-4">
-                    <Music size={40} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-3xl font-black">{station.title}</p>
-                    <p className="mt-1 text-lg text-white/90">{station.subtitle}</p>
-                    <p className="mt-2 text-base font-bold">
-                      {activeStation?.id === station.id && isPlaying
-                        ? '正在播放…'
-                        : '点这里听'}
-                    </p>
-                  </div>
-                </button>
-                {station.externalUrl && (
-                  <a
-                    href={station.externalUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block bg-black/20 px-5 py-3 text-center text-lg font-bold text-white underline"
-                    onClick={(e) => e.stopPropagation()}
+                <ArrowLeft size={22} />
+                回剧目列表
+              </button>
+              <p className="mb-2 text-center text-3xl font-black text-nana-ink">
+                {activeStation.title}
+              </p>
+              <p className="mb-4 text-center text-lg text-nana-ink/70">
+                选一段听，每段都是戏里不同地方的选段
+              </p>
+              <div className="space-y-3">
+                {activeStation.clips.map((clip, idx) => (
+                  <button
+                    key={clip.id}
+                    type="button"
+                    onClick={() => playClip(clip)}
+                    className={`flex w-full items-center gap-4 rounded-3xl border-4 px-5 py-5 text-left transition-transform active:scale-[0.98] ${
+                      activeClip?.id === clip.id
+                        ? 'border-emerald-600 bg-emerald-50'
+                        : 'border-emerald-200 bg-white'
+                    }`}
                   >
-                    {station.preferExternal
-                      ? '打开在线电台'
-                      : '打开外部潮剧链接'}
-                  </a>
-                )}
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-2xl font-black text-white">
+                      {idx + 1}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-2xl font-black text-nana-ink">{clip.label}</p>
+                      <p className="mt-1 text-base font-bold text-emerald-700">
+                        {activeClip?.id === clip.id && isPlaying
+                          ? '正在播放…'
+                          : '点这里听'}
+                      </p>
+                    </div>
+                    <Volume2 size={28} className="text-emerald-600" />
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
+              {activeStation.externalUrl && (
+                <a
+                  href={activeStation.externalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 block rounded-2xl bg-emerald-700 py-3 text-center text-lg font-bold text-white underline"
+                >
+                  打开外部完整潮剧
+                </a>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="mb-4 text-center text-xl font-semibold text-nana-ink/80">
+                点一张卡片，小管家帮您开戏
+              </p>
+              <div className="space-y-4">
+                {operaStations.map((station) => (
+                  <div
+                    key={station.id}
+                    className={`overflow-hidden rounded-3xl bg-gradient-to-br ${station.color} p-1 shadow-xl`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => openStation(station)}
+                      className="flex w-full items-center gap-4 rounded-[1.35rem] bg-white/10 px-5 py-6 text-left text-white backdrop-blur-sm transition-transform active:scale-[0.98]"
+                    >
+                      <div className="rounded-2xl bg-white/20 p-4">
+                        <Music size={40} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-3xl font-black">{station.title}</p>
+                        <p className="mt-1 text-lg text-white/90">{station.subtitle}</p>
+                        <p className="mt-2 text-base font-bold">
+                          {station.preferExternal
+                            ? '点这里打开电台'
+                            : station.clips?.length
+                              ? `共 ${station.clips.length} 段可选`
+                              : '点这里听'}
+                        </p>
+                      </div>
+                    </button>
+                    {station.preferExternal && station.externalUrl && (
+                      <a
+                        href={station.externalUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block bg-black/20 px-5 py-3 text-center text-lg font-bold text-white underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        打开在线电台
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
           {playHint && (
             <p className="mt-4 text-center text-lg font-medium text-amber-800">
               {playHint}
             </p>
           )}
-          {isPlaying && activeStation && (
+          {isPlaying && activeClip && (
             <SoundWave className="mt-6" barClassName="bg-emerald-600" />
           )}
         </main>

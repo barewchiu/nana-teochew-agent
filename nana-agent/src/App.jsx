@@ -858,7 +858,12 @@ function App() {
             <div className="mb-4 rounded-3xl border-4 border-nana-warm bg-white p-6 shadow-md">
               {pendingReply.source === 'kb' && (
                 <p className="mb-2 text-sm font-bold text-emerald-700">
-                  乡音知识库已听懂 · 用熟悉的话回您
+                  乡音回复包 · 用熟悉的话回您
+                </p>
+              )}
+              {pendingReply.audio && pendingReply.audio.includes('/replies/') && (
+                <p className="mb-2 text-sm font-bold text-nana-warm">
+                  正在播放乡音原声
                 </p>
               )}
               <p className="text-3xl font-bold leading-snug text-nana-ink sm:text-4xl">

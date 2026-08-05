@@ -122,55 +122,55 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
     ),
 ]
 
-# Grounded Teochew replies + optional preset audio (served from frontend /public)
+# Grounded Teochew replies + voice-pack audio under /audio/replies/
 INTENT_REPLIES: dict[str, dict[str, str]] = {
     "eat": {
         "reply": "食饱咯，阿嫲您呢？慢慢食，唔好急。",
         "reply_zh": "吃饱了，奶奶您呢？慢慢吃，别着急。",
-        "audio": "/audio/chat_1.m4a",
-        "note": "知识库意图：吃饭问候",
+        "audio": "/audio/replies/eat.m4a",
+        "note": "乡音回复包：吃饭问候",
     },
     "meds": {
         "reply": "阿嫲，爱准时食药啰，记得多饮水。我陪您记着。",
         "reply_zh": "奶奶，要按时吃药，记得多喝水。我帮您记着。",
-        "audio": "/audio/remind_meds.m4a",
-        "note": "知识库意图：吃药提醒",
+        "audio": "/audio/replies/meds.m4a",
+        "note": "乡音回复包：吃药提醒",
     },
     "miss_family": {
         "reply": "阿公在天顶看着您，唔好哭，我陪您讲。",
         "reply_zh": "爷爷在天上看着您，别哭，我陪您说。",
-        "audio": "/audio/chat_2.m4a",
-        "note": "知识库意图：思念家人",
+        "audio": "/audio/replies/miss_family.m4a",
+        "note": "乡音回复包：思念家人",
     },
     "thanks": {
         "reply": "阿嫲，我在这里，随时听您讲话。",
         "reply_zh": "奶奶，我在这里，随时听您说话。",
-        "audio": "/audio/chat_3.m4a",
-        "note": "知识库意图：道谢陪伴",
+        "audio": "/audio/replies/thanks.m4a",
+        "note": "乡音回复包：道谢陪伴",
     },
     "weather": {
         "reply": "今日天时看着还好，阿嫲出门爱加件衫，免着凉。",
         "reply_zh": "今天天气看着还好，奶奶出门要加件衣服，别着凉。",
-        "audio": "",
-        "note": "知识库意图：天气关心",
+        "audio": "/audio/replies/weather.m4a",
+        "note": "乡音回复包：天气关心（若无文件则前端回退文字）",
     },
     "opera": {
         "reply": "好呀阿嫲，想听潮剧就按绿色钮，我帮您开戏。",
         "reply_zh": "好呀奶奶，想听潮剧就按绿色按钮，我帮您打开。",
-        "audio": "",
-        "note": "知识库意图：潮剧娱乐",
+        "audio": "/audio/replies/opera.m4a",
+        "note": "乡音回复包：潮剧娱乐（若无文件则前端回退文字）",
     },
     "health": {
         "reply": "阿嫲身体有无要紧？慢慢讲，我听着。要紧就喊家里后生。",
         "reply_zh": "奶奶身体有没有事？慢慢说，我听着。要紧就叫家里年轻人。",
-        "audio": "",
-        "note": "知识库意图：身体关怀",
+        "audio": "/audio/replies/health.m4a",
+        "note": "乡音回复包：身体关怀（若无文件则前端回退文字）",
     },
     "grandson": {
         "reply": "孙仔惦记您啰。想听留言，就按蓝色钮「听孙子的信」。",
         "reply_zh": "孙子惦记您呢。想听留言，就按蓝色按钮「听孙子的信」。",
-        "audio": "/audio/miss_you.m4a",
-        "note": "知识库意图：孙子/回家",
+        "audio": "/audio/replies/grandson.m4a",
+        "note": "乡音回复包：孙子/回家",
     },
 }
 

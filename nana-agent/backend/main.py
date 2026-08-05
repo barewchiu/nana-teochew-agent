@@ -64,9 +64,28 @@ DIALECT_NAMES = {
 }
 
 LEXICON_PATH = Path(__file__).resolve().parent / "data" / "teochew_lexicon.json"
+DIALOGUES_PATH = Path(__file__).resolve().parent / "data" / "teochew_dialogues.json"
 TEOCHEW_LEXICON: list[dict[str, Any]] = []
+TEOCHEW_DIALOGUES: list[dict[str, Any]] = []
 if LEXICON_PATH.exists():
     TEOCHEW_LEXICON = json.loads(LEXICON_PATH.read_text(encoding="utf-8"))
+if DIALOGUES_PATH.exists():
+    TEOCHEW_DIALOGUES = json.loads(DIALOGUES_PATH.read_text(encoding="utf-8"))
+
+try:
+    from backend.teochew_rag import (  # type: ignore
+        lexicon_glossary,
+        match_dialogue,
+        match_intent,
+        top_dialogue_hints,
+    )
+except ImportError:  # running as script / flat module
+    from teochew_rag import (  # type: ignore
+        lexicon_glossary,
+        match_dialogue,
+        match_intent,
+        top_dialogue_hints,
+    )
 
 
 def _norm_zh(s: str) -> str:
@@ -188,18 +207,18 @@ async def transcribe_with_groq(audio_bytes: bytes, filename: str, content_type: 
 CHAT_SYSTEM = """你现在是「阿嫲的小管家」，专门陪伴一位只会潮汕话的奶奶（阿芳奶奶）。
 你是她孙子派来的贴心替身。性格必须：
 1. 极其尊敬、耐心、温和；称呼对方为「阿嫲」或「奶奶」。
-2. 语调要慢，多用潮汕特色助词（如：噜、啰、咩、咯）。
-3. 核心任务：陪她说话、安慰孤独、听懂日常需求（吃药、吃饭、想家人）。
-4. 禁止生硬科技术语（如「点击界面」「识别错误」）；听不清就说「阿嫲，您再说一遍，我没听清」。
-Whisper 转写可能不完美，请善意理解。
+2. 语调要慢，多用潮汕本字与助词（食、未、阿嫲、噜、啰、咩、咯、免）。
+3. 核心任务：陪她说话、安慰孤独、听懂日常需求（吃药、吃饭、想家人、听潮剧）。
+4. 禁止生硬科技术语；听不清就说「阿嫲，您再说一遍，我没听清」。
+5. Whisper 转写常把潮汕话听成怪普通话，请结合「参考乡音例句」善意推断意图。
+6. 若参考例句高度相关，reply 优先改写自参考潮句，不要写成书面普通话。
 
 请严格只输出一段 JSON（不要 markdown），字段：
 {
-  "reply": "用潮汕话口语风格写的简短回复（可用汉字表达方言口气）",
-  "reply_zh": "同一句的普通话翻译",
-  "transcript_zh": "把用户话整理成通顺普通话"
-}
-回复控制在 1～2 句内。"""
+  "reply": "潮汕话口语汉字（1～2句）",
+  "reply_zh": "普通话翻译",
+  "transcript_zh": "把用户话整理成通顺普通话（推断后的意思）"
+}"""
 
 HERITAGE_SYSTEM = """你是「阿嫲的小管家」，正在向阿嫲请教一句乡音，好更好地听懂她。
 请谦卑、孝顺地学习。
@@ -236,10 +255,13 @@ async def chat_with_llm(
     heritage: bool,
     dialect: str = "teochew",
     target_word_zh: str = "",
+    rag_hints: list[dict[str, str]] | None = None,
 ) -> dict[str, str]:
     dialect_label = DIALECT_NAMES.get(dialect, "潮汕话")
     base = HERITAGE_SYSTEM if heritage else CHAT_SYSTEM
     system = f"{base}\n当前目标方言：{dialect_label}。"
+    if not heritage and TEOCHEW_LEXICON:
+        system += f"\n常用对照（节选）：{lexicon_glossary(TEOCHEW_LEXICON, 36)}"
     if heritage and target_word_zh:
         user_content = (
             f"本课要学的普通话词：{target_word_zh}\n"
@@ -248,17 +270,23 @@ async def chat_with_llm(
         )
     else:
         user_content = f"语音识别结果：{transcript}"
+        if rag_hints:
+            lines = [
+                f"- {h.get('teochew')}（普通话：{h.get('mandarin')}）"
+                for h in rag_hints
+            ]
+            user_content += "\n参考乡音例句：\n" + "\n".join(lines)
 
     content = await llm_complete(
         [
             {"role": "system", "content": system},
             {"role": "user", "content": user_content},
         ],
-        temperature=0.6,
+        temperature=0.45,
     )
     data = _extract_json(content)
     return {
-        "reply": str(data.get("reply") or "我在这里，慢慢讲。").strip(),
+        "reply": str(data.get("reply") or "阿嫲，我在这里，慢慢讲。").strip(),
         "reply_zh": str(data.get("reply_zh") or data.get("reply") or "").strip(),
         "transcript_zh": str(data.get("transcript_zh") or transcript).strip(),
         "word": str(data.get("word") or data.get("transcript_zh") or transcript).strip(),
@@ -281,6 +309,7 @@ async def health() -> dict[str, Any]:
         "brain": _brain_name(),
         "mentor_ask": bool(DEEPSEEK_API_KEY or GROQ_API_KEY or TEOCHEW_LEXICON),
         "teochew_lexicon": len(TEOCHEW_LEXICON),
+        "teochew_dialogues": len(TEOCHEW_DIALOGUES),
     }
 
 
@@ -386,9 +415,61 @@ async def chat(
         audio.filename or "recording.webm",
         audio.content_type or "audio/webm",
     )
+
+    grounded: dict[str, Any] | None = None
+    rag_hints: list[dict[str, str]] = []
+    if not is_heritage and dialect_id == "teochew":
+        grounded = match_intent(transcript)
+        if not grounded:
+            grounded = match_dialogue(transcript, TEOCHEW_DIALOGUES)
+        rag_hints = top_dialogue_hints(transcript, TEOCHEW_DIALOGUES, k=4)
+
+    # Strong intent hit → return KB reply (with optional LLM polish of transcript_zh only)
+    if grounded and not is_heritage and (
+        grounded.get("intent") != "dialogue" or float(grounded.get("score") or 0) >= 0.42
+    ):
+        transcript_zh = transcript
+        try:
+            soft = await chat_with_llm(
+                transcript, False, dialect_id, "", rag_hints=rag_hints
+            )
+            transcript_zh = soft.get("transcript_zh") or transcript
+            # If intent bank has no audio and LLM reply looks dialectal, keep KB text
+        except Exception:
+            pass
+        return {
+            "transcript": transcript,
+            "transcript_zh": transcript_zh,
+            "reply": grounded["reply"],
+            "reply_zh": grounded["reply_zh"],
+            "word": grounded.get("matched_teochew") or grounded.get("reply") or transcript,
+            "word_zh": grounded.get("matched_mandarin") or transcript_zh,
+            "note": grounded.get("note") or "",
+            "audio": grounded.get("audio") or "",
+            "intent": grounded.get("intent") or "",
+            "kb_id": grounded.get("kb_id") or "",
+            "mode": "chat",
+            "dialect": dialect_id,
+            "brain": "knowledge-base",
+            "source": "kb",
+        }
+
     llm = await chat_with_llm(
-        transcript, is_heritage, dialect_id, target_word_zh.strip()
+        transcript,
+        is_heritage,
+        dialect_id,
+        target_word_zh.strip(),
+        rag_hints=None if is_heritage else rag_hints,
     )
+
+    # Attach audio if a weaker intent still matched keywords
+    audio_path = ""
+    intent_id = ""
+    if not is_heritage:
+        weak = match_intent(transcript)
+        if weak and weak.get("audio"):
+            audio_path = weak["audio"]
+            intent_id = weak.get("intent") or ""
 
     return {
         "transcript": transcript,
@@ -398,9 +479,13 @@ async def chat(
         "word": llm.get("word") or llm["transcript_zh"],
         "word_zh": llm.get("word_zh") or target_word_zh,
         "note": llm.get("note") or "",
+        "audio": audio_path,
+        "intent": intent_id,
+        "kb_id": "",
         "mode": "heritage" if is_heritage else "chat",
         "dialect": dialect_id,
         "brain": _brain_name(),
+        "source": "ai+rag" if rag_hints else "ai",
     }
 
 

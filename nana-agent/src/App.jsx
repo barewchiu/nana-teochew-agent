@@ -16,34 +16,10 @@ import {
 } from './lib/voiceEchoMapping';
 import { operaStations } from './lib/operaStations';
 import { apiUrl } from './lib/api';
+import { CHAT_TURNS, resolveChatAudio } from './lib/chatKb';
 
 /** Modes: HOME | MSG | CHAT | OPERA */
 const BAR_COUNT = 7;
-
-const CHAT_TURNS = [
-  {
-    recognized: '哩食饱未？',
-    recognizedZh: '你吃饱了吗？',
-    reply: '食饱咯，阿嫲您呢？',
-    replyZh: '吃饱了，奶奶您呢？',
-    audio: '/audio/chat_1.m4a',
-  },
-  {
-    recognized: '今日想阿公了',
-    recognizedZh: '今天想爷爷了',
-    reply: '阿公在天顶看着您，唔好哭，我陪您讲。',
-    replyZh: '爷爷在天上看着您，别哭，我陪您说。',
-    audio: '/audio/chat_2.m4a',
-  },
-  {
-    recognized: '谢谢你陪我',
-    recognizedZh: '谢谢你陪我',
-    reply: '阿嫲，我在这里，随时听您讲话。',
-    replyZh: '奶奶，我在这里，随时听您说话。',
-    audio: '/audio/chat_3.m4a',
-  },
-];
-
 function formatRecordTime(totalSeconds) {
   const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
   const ss = String(totalSeconds % 60).padStart(2, '0');
@@ -503,12 +479,22 @@ function App() {
       }
 
       addMessage('user', data.transcript, data.transcript_zh);
+      const audio =
+        data.audio ||
+        resolveChatAudio({
+          audio: data.audio,
+          intent: data.intent,
+          reply: data.reply,
+        });
       applyReply({
         reply: data.reply,
         replyZh: data.reply_zh,
-        audio: null,
+        audio,
         recognized: data.transcript,
         recognizedZh: data.transcript_zh,
+        note: data.note,
+        intent: data.intent,
+        source: data.source,
       });
     } catch (err) {
       console.error(err);
@@ -870,6 +856,11 @@ function App() {
 
           {status === 'responding' && pendingReply && (
             <div className="mb-4 rounded-3xl border-4 border-nana-warm bg-white p-6 shadow-md">
+              {pendingReply.source === 'kb' && (
+                <p className="mb-2 text-sm font-bold text-emerald-700">
+                  乡音知识库已听懂 · 用熟悉的话回您
+                </p>
+              )}
               <p className="text-3xl font-bold leading-snug text-nana-ink sm:text-4xl">
                 {pendingReply.reply}
               </p>

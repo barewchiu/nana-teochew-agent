@@ -39,11 +39,13 @@ export const operaStations = [
   {
     id: 'teochew_radio',
     title: '潮语广播',
-    subtitle: '汕头经济广播 · 在线收听',
+    subtitle: '澄海人民广播电台 FM100.5 · 本页收听',
     color: 'from-teal-500 to-cyan-600',
+    /** Qingting live MP3 stream (works in HTML5 audio) */
+    streamUrl: 'https://lhttp.qingting.fm/live/5022439/64k.mp3',
     audio: null,
     clips: null,
-    externalUrl: 'https://tingfm.com/radio/146',
-    preferExternal: true,
+    externalUrl: 'https://radio.garden/listen/fm100-5/JQz4a60m',
+    preferExternal: false,
   },
 ];

@@ -106,6 +106,7 @@ function App() {
   const [activeMsg, setActiveMsg] = useState(null);
   const [activeStation, setActiveStation] = useState(null);
   const [activeClip, setActiveClip] = useState(null);
+  const [radioLive, setRadioLive] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
   const [playHint, setPlayHint] = useState('');
 
@@ -285,6 +286,7 @@ function App() {
     setActiveMsg(null);
     setActiveStation(null);
     setActiveClip(null);
+    setRadioLive(false);
     setPlayHint('');
   };
 
@@ -334,7 +336,44 @@ function App() {
     setMode('OPERA');
     setActiveStation(null);
     setActiveClip(null);
+    setRadioLive(false);
     setPlayHint('');
+  };
+
+  const stopRadio = () => {
+    stopAudio();
+    setRadioLive(false);
+    setIsPlaying(false);
+    setPlayHint('');
+  };
+
+  const playRadioStream = (station) => {
+    const stream = station.streamUrl;
+    if (!stream) {
+      if (station.externalUrl) {
+        window.open(station.externalUrl, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
+    setActiveStation(station);
+    setActiveClip(null);
+    setRadioLive(true);
+    setPlayHint('正在连接电台…');
+    const audio = audioRef.current;
+    if (!audio) return;
+    stopAudio();
+    audio.src = stream;
+    setIsPlaying(true);
+    audio
+      .play()
+      .then(() => {
+        setPlayHint('澄海电台直播中 · 可继续待在本页听');
+      })
+      .catch(() => {
+        setIsPlaying(false);
+        setRadioLive(false);
+        setPlayHint('本页暂时连不上直播，可点下方打开国际站收听。');
+      });
   };
 
   const openStation = (station) => {
@@ -342,15 +381,22 @@ function App() {
     if (station.preferExternal && station.externalUrl) {
       setActiveStation(station);
       setActiveClip(null);
+      setRadioLive(false);
       stopAudio();
       setIsPlaying(false);
       setPlayHint('正在打开电台收听页…');
       window.open(station.externalUrl, '_blank', 'noopener,noreferrer');
       return;
     }
+    // Live radio: play stream in-page
+    if (station.streamUrl) {
+      playRadioStream(station);
+      return;
+    }
     if (station.clips?.length) {
       stopAudio();
       setIsPlaying(false);
+      setRadioLive(false);
       setActiveStation(station);
       setActiveClip(null);
       return;
@@ -358,6 +404,7 @@ function App() {
     // Fallback: single audio
     setActiveStation(station);
     setActiveClip(null);
+    setRadioLive(false);
     if (station.audio) {
       playAudioFile(station.audio);
     } else if (station.externalUrl) {
@@ -369,6 +416,7 @@ function App() {
     stopAudio();
     setActiveStation(null);
     setActiveClip(null);
+    setRadioLive(false);
     setPlayHint('');
   };
 
@@ -849,7 +897,51 @@ function App() {
       {/* OPERA */}
       {mode === 'OPERA' && (
         <main className="mx-auto w-full max-w-lg flex-1">
-          {activeStation?.clips?.length ? (
+          {radioLive && activeStation?.streamUrl ? (
+            <>
+              <button
+                type="button"
+                onClick={backToOperaList}
+                className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-5 py-2 text-lg font-bold text-nana-ink shadow"
+              >
+                <ArrowLeft size={22} />
+                回剧目列表
+              </button>
+              <div className="rounded-[2rem] bg-gradient-to-br from-teal-500 to-cyan-600 p-6 text-white shadow-xl">
+                <p className="text-sm font-bold text-teal-100">乡音电台 · 本页直播</p>
+                <p className="mt-2 text-3xl font-black">{activeStation.title}</p>
+                <p className="mt-2 text-lg text-teal-50">{activeStation.subtitle}</p>
+                {isPlaying && (
+                  <SoundWave className="my-6" barClassName="bg-white" />
+                )}
+                <p className="text-center text-xl font-bold">
+                  {isPlaying ? '正在收听…' : '已暂停 / 连接中'}
+                </p>
+                <div className="mt-5 flex flex-col gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      isPlaying ? stopRadio() : playRadioStream(activeStation)
+                    }
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-4 text-2xl font-black text-teal-700"
+                  >
+                    <Volume2 size={32} />
+                    {isPlaying ? '停止收听' : '继续收听'}
+                  </button>
+                  {activeStation.externalUrl && (
+                    <a
+                      href={activeStation.externalUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-2xl bg-black/20 py-3 text-center text-lg font-bold text-white underline"
+                    >
+                      打开国际站备用收听
+                    </a>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : activeStation?.clips?.length ? (
             <>
               <button
                 type="button"
@@ -926,25 +1018,16 @@ function App() {
                         <p className="text-3xl font-black">{station.title}</p>
                         <p className="mt-1 text-lg text-white/90">{station.subtitle}</p>
                         <p className="mt-2 text-base font-bold">
-                          {station.preferExternal
-                            ? '点这里打开电台'
-                            : station.clips?.length
-                              ? `共 ${station.clips.length} 段可选`
-                              : '点这里听'}
+                          {station.streamUrl
+                            ? '点这里本页收听'
+                            : station.preferExternal
+                              ? '点这里打开电台'
+                              : station.clips?.length
+                                ? `共 ${station.clips.length} 段可选`
+                                : '点这里听'}
                         </p>
                       </div>
                     </button>
-                    {station.preferExternal && station.externalUrl && (
-                      <a
-                        href={station.externalUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block bg-black/20 px-5 py-3 text-center text-lg font-bold text-white underline"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        打开在线电台
-                      </a>
-                    )}
                   </div>
                 ))}
               </div>

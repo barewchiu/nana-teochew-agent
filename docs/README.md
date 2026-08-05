@@ -7,6 +7,7 @@
 | [Pivot_To_Nana_Agent.md](./Pivot_To_Nana_Agent.md) | 从乡音回响 → 小管家的转型 brief |
 | [Nana_Agent_实施指南.md](./Nana_Agent_实施指南.md) | UI/留言桥/潮剧分步实施参考 |
 | [乡音回复录音包.md](./乡音回复录音包.md) | 第一步：家人录潮语回复口播清单 |
+| [LIVE测试错读记录.md](./LIVE测试错读记录.md) | 第二步：真人 LIVE 测 + 错读原料表 |
 
 ## 归档（Phase 1 · Echo of Roots）
 

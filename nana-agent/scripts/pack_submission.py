@@ -17,6 +17,8 @@ SKIP_DIR_NAMES = {
     ".git",
     ".cursor",
     "submit",
+    "audio_full_local",
+    "tools",
 }
 SKIP_FILE_NAMES = {".env", ".DS_Store"}
 SKIP_SUFFIXES = {".pyc", ".log"}

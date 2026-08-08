@@ -74,6 +74,10 @@ if DIALOGUES_PATH.exists():
 
 try:
     from backend.teochew_rag import (  # type: ignore
+        INTENT_IDS,
+        WHISPER_TEOCHEW_PROMPT,
+        correct_mishear,
+        grounded_from_intent,
         lexicon_glossary,
         match_dialogue,
         match_intent,
@@ -81,6 +85,10 @@ try:
     )
 except ImportError:  # running as script / flat module
     from teochew_rag import (  # type: ignore
+        INTENT_IDS,
+        WHISPER_TEOCHEW_PROMPT,
+        correct_mishear,
+        grounded_from_intent,
         lexicon_glossary,
         match_dialogue,
         match_intent,
@@ -180,6 +188,8 @@ async def transcribe_with_groq(audio_bytes: bytes, filename: str, content_type: 
                     "model": GROQ_WHISPER_MODEL,
                     "language": "zh",
                     "response_format": "json",
+                    # Bias Whisper toward Teochew daily phrases (LIVE mishear mitigation)
+                    "prompt": WHISPER_TEOCHEW_PROMPT,
                 }
                 resp = await client.post(
                     "https://api.groq.com/openai/v1/audio/transcriptions",
@@ -248,6 +258,46 @@ MENTOR_ASK_SYSTEM = """你是「阿嫲的小管家」，想向阿嫲请教下一
   "prompt_zh": "完整普通话提问",
   "note_hint": "学成后可写进记事的一句注释"
 }"""
+
+INTENT_CLASSIFY_SYSTEM = """你是潮汕话陪护助手的「意图分类器」。
+语音识别常把潮汕话听成乱码普通话。请根据识别文字，推断阿嫲最可能想表达的意图。
+
+只能从下列 id 中选一个（完全无关才选 none）：
+- eat：吃饭/食饱/饿
+- meds：吃药/食药
+- miss_family：想家人、想阿公、想你、喜欢你、孤单
+- thanks：谢谢、多谢、有人陪
+- weather：天气、冷热、下雨
+- opera：潮剧、听戏、广播
+- health：身体不舒服、病痛
+- grandson：孙子、返来、回家、留言
+- none：无法判断
+
+严格只输出 JSON：
+{
+  "intent": "eat|meds|miss_family|thanks|weather|opera|health|grandson|none",
+  "transcript_zh": "推断的通顺普通话意思",
+  "confidence": "high|medium|low"
+}"""
+
+
+async def classify_intent_with_llm(transcript: str) -> dict[str, str]:
+    content = await llm_complete(
+        [
+            {"role": "system", "content": INTENT_CLASSIFY_SYSTEM},
+            {"role": "user", "content": f"语音识别结果：{transcript}"},
+        ],
+        temperature=0.1,
+    )
+    data = _extract_json(content)
+    intent = str(data.get("intent") or "none").strip().lower()
+    if intent not in INTENT_IDS:
+        intent = "none"
+    return {
+        "intent": intent,
+        "transcript_zh": str(data.get("transcript_zh") or transcript).strip(),
+        "confidence": str(data.get("confidence") or "low").strip().lower(),
+    }
 
 
 async def chat_with_llm(
@@ -410,41 +460,79 @@ async def chat(
 
     is_heritage = heritage.lower() in {"1", "true", "yes", "on"}
     dialect_id = (dialect or "teochew").strip().lower()
-    transcript = await transcribe_with_groq(
+    raw_transcript = await transcribe_with_groq(
         audio_bytes,
         audio.filename or "recording.webm",
         audio.content_type or "audio/webm",
     )
 
+    # P2: rewrite LIVE Whisper garble before grounding
+    mishear = correct_mishear(raw_transcript)
+    transcript = mishear.get("corrected") or raw_transcript
+    mishear_note = ""
+    if mishear.get("mishear_hit"):
+        mishear_note = f"错读纠正：{mishear['mishear_hit']}→{transcript}"
+
     grounded: dict[str, Any] | None = None
     rag_hints: list[dict[str, str]] = []
     if not is_heritage and dialect_id == "teochew":
-        grounded = match_intent(transcript)
+        if mishear.get("intent"):
+            grounded = grounded_from_intent(
+                str(mishear["intent"]),
+                note_extra=mishear_note or "错读表直接命中",
+            )
+        if not grounded:
+            grounded = match_intent(transcript) or match_intent(raw_transcript)
         if not grounded:
             grounded = match_dialogue(transcript, TEOCHEW_DIALOGUES)
+            if not grounded and transcript != raw_transcript:
+                grounded = match_dialogue(raw_transcript, TEOCHEW_DIALOGUES)
+        # Still nothing → LLM forced into 8 intents (then play voice pack)
+        if not grounded:
+            try:
+                classified = await classify_intent_with_llm(
+                    f"{raw_transcript}\n（纠正候选：{transcript}）"
+                )
+                conf = classified.get("confidence") or "low"
+                # Dialect ASR free-chat is usually worse; accept classified intents
+                if classified.get("intent") in INTENT_IDS:
+                    grounded = grounded_from_intent(
+                        classified["intent"],
+                        note_extra=f"LLM意图归类（{conf}）",
+                    )
+                    if grounded and classified.get("transcript_zh"):
+                        grounded["_transcript_zh"] = classified["transcript_zh"]
+            except Exception:
+                grounded = None
         rag_hints = top_dialogue_hints(transcript, TEOCHEW_DIALOGUES, k=4)
 
     # Strong intent hit → return KB reply (with optional LLM polish of transcript_zh only)
     if grounded and not is_heritage and (
         grounded.get("intent") != "dialogue" or float(grounded.get("score") or 0) >= 0.42
     ):
-        transcript_zh = transcript
+        transcript_zh = grounded.pop("_transcript_zh", None) or transcript
         try:
             soft = await chat_with_llm(
-                transcript, False, dialect_id, "", rag_hints=rag_hints
+                f"{raw_transcript}（理解为：{transcript}）",
+                False,
+                dialect_id,
+                "",
+                rag_hints=rag_hints,
             )
-            transcript_zh = soft.get("transcript_zh") or transcript
-            # If intent bank has no audio and LLM reply looks dialectal, keep KB text
+            transcript_zh = soft.get("transcript_zh") or transcript_zh
         except Exception:
             pass
+        note = grounded.get("note") or ""
+        if mishear_note and mishear_note not in note:
+            note = f"{note}；{mishear_note}" if note else mishear_note
         return {
-            "transcript": transcript,
+            "transcript": raw_transcript,
             "transcript_zh": transcript_zh,
             "reply": grounded["reply"],
             "reply_zh": grounded["reply_zh"],
             "word": grounded.get("matched_teochew") or grounded.get("reply") or transcript,
             "word_zh": grounded.get("matched_mandarin") or transcript_zh,
-            "note": grounded.get("note") or "",
+            "note": note,
             "audio": grounded.get("audio") or "",
             "intent": grounded.get("intent") or "",
             "kb_id": grounded.get("kb_id") or "",
@@ -452,10 +540,11 @@ async def chat(
             "dialect": dialect_id,
             "brain": "knowledge-base",
             "source": "kb",
+            "corrected": transcript if transcript != raw_transcript else "",
         }
 
     llm = await chat_with_llm(
-        transcript,
+        transcript if transcript != raw_transcript else raw_transcript,
         is_heritage,
         dialect_id,
         target_word_zh.strip(),
@@ -466,19 +555,19 @@ async def chat(
     audio_path = ""
     intent_id = ""
     if not is_heritage:
-        weak = match_intent(transcript)
+        weak = match_intent(transcript) or match_intent(raw_transcript)
         if weak and weak.get("audio"):
             audio_path = weak["audio"]
             intent_id = weak.get("intent") or ""
 
     return {
-        "transcript": transcript,
+        "transcript": raw_transcript,
         "transcript_zh": llm["transcript_zh"],
         "reply": llm["reply"],
         "reply_zh": llm["reply_zh"],
         "word": llm.get("word") or llm["transcript_zh"],
         "word_zh": llm.get("word_zh") or target_word_zh,
-        "note": llm.get("note") or "",
+        "note": llm.get("note") or mishear_note,
         "audio": audio_path,
         "intent": intent_id,
         "kb_id": "",
@@ -486,6 +575,7 @@ async def chat(
         "dialect": dialect_id,
         "brain": _brain_name(),
         "source": "ai+rag" if rag_hints else "ai",
+        "corrected": transcript if transcript != raw_transcript else "",
     }
 
 

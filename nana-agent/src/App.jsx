@@ -492,6 +492,7 @@ function App() {
         audio,
         recognized: data.transcript,
         recognizedZh: data.transcript_zh,
+        corrected: data.corrected || '',
         note: data.note,
         intent: data.intent,
         source: data.source,
@@ -592,6 +593,9 @@ function App() {
       return isLiveMode ? '小管家正在听懂您…' : '小管家正在想怎么回您…';
     }
     if (status === 'responding' && pendingReply) {
+      if (pendingReply.corrected) {
+        return `听成「${pendingReply.recognized}」· 理解为「${pendingReply.corrected}」`;
+      }
       return `我听到了：${pendingReply.recognized}`;
     }
     return '按大红钮，跟小管家讲话';

@@ -15,6 +15,102 @@ def norm_text(s: str) -> str:
     return s
 
 
+# LIVE 实测 Whisper 乱码 / 近音 → (规范说法, 意图)
+# 来源：docs/LIVE测试错读记录.md（2026-08）
+MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
+    # weather
+    ("金力提示党意", "今日天气怎样", "weather"),
+    ("金力提示", "今日天气怎样", "weather"),
+    ("提示党意", "天气怎样", "weather"),
+    ("党意", "天气", "weather"),
+    # thanks
+    ("这一下了铺的瓦", "谢谢你陪我", "thanks"),
+    ("一下了铺的瓦", "谢谢你陪我", "thanks"),
+    ("铺的瓦", "谢谢", "thanks"),
+    ("了铺的", "谢谢", "thanks"),
+    # health
+    ("心態有地驚無所謀", "身体有点不舒服", "health"),
+    ("心态有地惊无所谋", "身体有点不舒服", "health"),
+    ("驚無所謀", "不舒服", "health"),
+    ("惊无所谋", "不舒服", "health"),
+    ("有地惊", "有点不舒服", "health"),
+    ("無所謀", "不舒服", "health"),
+    ("无所谋", "不舒服", "health"),
+    # grandson
+    ("草荣有等来吧", "孙子有无返来", "grandson"),
+    ("草荣有等来", "孙子有无返来", "grandson"),
+    ("草荣有等", "孙子返来", "grandson"),
+    ("草荣", "孙子", "grandson"),
+    ("有等来", "返来", "grandson"),
+    # opera
+    ("最愛聽著機啊", "想听潮剧", "opera"),
+    ("最爱听着机啊", "想听潮剧", "opera"),
+    ("聽著機", "听潮剧", "opera"),
+    ("听着机", "听潮剧", "opera"),
+    ("著機啊", "潮剧", "opera"),
+    # affection → miss_family / companionship
+    ("哇醒了了", "我想你", "miss_family"),
+    ("哇 醒了了", "我想你", "miss_family"),
+    ("醒了了", "我想你", "miss_family"),
+    ("哇咪花了", "我喜欢你", "miss_family"),
+    ("哇 咪花了", "我喜欢你", "miss_family"),
+    ("咪花了", "我喜欢你", "miss_family"),
+    # meds common dialect ASR drift
+    ("食若", "食药", "meds"),
+    ("食钥", "食药", "meds"),
+    ("吃药未", "食药未", "meds"),
+    ("爱食药", "食药", "meds"),
+    # miss grandpa
+    ("想阿公", "今日想阿公了", "miss_family"),
+    ("想阿公了", "今日想阿公了", "miss_family"),
+]
+
+
+def correct_mishear(transcript: str) -> dict[str, Any]:
+    """Rewrite Whisper garble using LIVE mishear table. Longest key wins."""
+    raw = (transcript or "").strip()
+    if not raw:
+        return {
+            "transcript": raw,
+            "corrected": raw,
+            "intent": None,
+            "mishear_hit": "",
+        }
+    text_n = norm_text(raw)
+    best: tuple[str, str, str] | None = None
+    best_len = 0
+    for key, canonical, intent_id in MISHEAR_CORRECTIONS:
+        nk = norm_text(key)
+        if not nk:
+            continue
+        if nk in text_n or text_n in nk:
+            if len(nk) > best_len:
+                best = (key, canonical, intent_id)
+                best_len = len(nk)
+    if not best:
+        return {
+            "transcript": raw,
+            "corrected": raw,
+            "intent": None,
+            "mishear_hit": "",
+        }
+    _key, canonical, intent_id = best
+    return {
+        "transcript": raw,
+        "corrected": canonical,
+        "intent": intent_id,
+        "mishear_hit": _key,
+    }
+
+
+# Whisper bias text (passed as prompt to Groq Whisper)
+WHISPER_TEOCHEW_PROMPT = (
+    "潮汕话日常。哩食饱未？阿嫲爱食药未？今日想阿公了。"
+    "谢谢你陪我。今日天气怎样？想听潮剧。身体有点不舒服。"
+    "孙子有无返来？我想你。我喜欢你。食药、返来、天时、潮剧、阿嫲。"
+)
+
+
 # Whisper / Mandarin mishearings → intent id
 INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
     (
@@ -32,6 +128,8 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "早饭",
             "午饭",
             "晚饭",
+            "食饱未",
+            "哩食",
         ),
     ),
     (
@@ -44,6 +142,10 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "高血压药",
             "忘记药",
             "药吞",
+            "食若",
+            "食钥",
+            "爱食药",
+            "药未",
         ),
     ),
     (
@@ -58,6 +160,10 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "寂寞",
             "无人陪",
             "一个人",
+            "阿公",
+            "喜欢你",
+            "咪花",
+            "醒了了",
         ),
     ),
     (
@@ -68,6 +174,8 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "感谢",
             "有心",
             "麻烦你",
+            "陪我",
+            "铺的瓦",
         ),
     ),
     (
@@ -81,6 +189,10 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "好热",
             "好冷",
             "刮风",
+            "金力",
+            "党意",
+            "天时怎样",
+            "天气怎样",
         ),
     ),
     (
@@ -93,6 +205,10 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "广播",
             "电台",
             "唱歌",
+            "听着机",
+            "聽著機",
+            "想听潮",
+            "开戏",
         ),
     ),
     (
@@ -106,6 +222,12 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "睡不好",
             "夗",
             "失眠",
+            "无所谋",
+            "無所謀",
+            "心態",
+            "心态",
+            "难受",
+            "有疾",
         ),
     ),
     (
@@ -118,9 +240,27 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "周末",
             "礼拜",
             "留言",
+            "草荣",
+            "有等来",
+            "有无返",
+            "返未",
         ),
     ),
 ]
+
+
+INTENT_IDS = frozenset(
+    {
+        "eat",
+        "meds",
+        "miss_family",
+        "thanks",
+        "weather",
+        "opera",
+        "health",
+        "grandson",
+    }
+)
 
 # Grounded Teochew replies + voice-pack audio under /audio/replies/
 INTENT_REPLIES: dict[str, dict[str, str]] = {
@@ -173,6 +313,15 @@ INTENT_REPLIES: dict[str, dict[str, str]] = {
         "note": "乡音回复包：孙子/回家",
     },
 }
+
+
+def grounded_from_intent(intent_id: str, *, note_extra: str = "") -> dict[str, Any] | None:
+    if intent_id not in INTENT_REPLIES:
+        return None
+    note = INTENT_REPLIES[intent_id].get("note") or ""
+    if note_extra:
+        note = f"{note}；{note_extra}"
+    return {"intent": intent_id, "hits": 1, **INTENT_REPLIES[intent_id], "note": note}
 
 
 def match_intent(transcript: str) -> dict[str, Any] | None:

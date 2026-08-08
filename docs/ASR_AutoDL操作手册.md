@@ -9,10 +9,11 @@
 本机生成（在仓库根目录）：
 
 ```powershell
-powershell -File teochew-asr/scripts/pack_holdout_for_autodl.ps1
+python teochew-asr/scripts/pack_holdout_for_autodl.py
+# 或: powershell -File teochew-asr/scripts/pack_holdout_for_autodl.ps1
 ```
 
-产物：`data/asr/eval_holdout/holdout_audio.zip`（含 32 条录音 + manifest）
+产物：`data/asr/eval_holdout/holdout_audio.zip`（含 32 条录音 + manifest；正斜杠路径，避免 unzip 告警）
 
 ## AutoDL 上操作（约 3 步）
 

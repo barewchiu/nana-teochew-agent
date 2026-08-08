@@ -119,10 +119,41 @@ _pipe = None
 
 def _load_audio_16k(audio_path: Path):
     """Load any ffmpeg-readable format to mono float32 @16k (m4a needs ffmpeg)."""
-    import librosa
+    import numpy as np
 
-    wav, _sr = librosa.load(str(audio_path), sr=16000, mono=True)
-    return wav
+    try:
+        import librosa
+
+        wav, _sr = librosa.load(str(audio_path), sr=16000, mono=True)
+        return np.asarray(wav, dtype=np.float32)
+    except Exception:
+        import subprocess
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            wav_path = Path(tmp.name)
+        try:
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    str(audio_path),
+                    "-ac",
+                    "1",
+                    "-ar",
+                    "16000",
+                    str(wav_path),
+                ],
+                check=True,
+                capture_output=True,
+            )
+            import librosa
+
+            wav, _sr = librosa.load(str(wav_path), sr=16000, mono=True)
+            return np.asarray(wav, dtype=np.float32)
+        finally:
+            wav_path.unlink(missing_ok=True)
 
 
 def asr_transformers(audio_path: Path, model_id: str) -> tuple[str, float]:

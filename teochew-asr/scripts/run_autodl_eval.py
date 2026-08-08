@@ -95,7 +95,7 @@ export WORKDIR={REMOTE_TMP}
 export REPO_DIR={REPO}
 export HOLDOUT_ZIP={REMOTE_TMP}/holdout_audio.zip
 export MODEL=panlr/whisper-finetune-teochew
-export PATH="/root/miniconda3/bin:$PATH"
+export PATH="/root/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 export HF_ENDPOINT="https://hf-mirror.com"
 export HF_HUB_ENABLE_HF_TRANSFER=0
 # Prefer hf-mirror; skip network_turbo (can cause Errno 99 to huggingface.co)
@@ -146,10 +146,14 @@ bash "$REPO_DIR/teochew-asr/scripts/autodl_bootstrap.sh"
                 sftp.get(f"{remote_reports}/{name}", str(LOCAL_REPORT_DIR / name))
         sftp.close()
 
-        jsons = sorted(LOCAL_REPORT_DIR.glob("holdout_transformers_*.json"))
+        jsons = sorted(
+            LOCAL_REPORT_DIR.glob("holdout_transformers_*.json"),
+            key=lambda p: p.stat().st_mtime,
+        )
         if jsons:
-            data = json.loads(jsons[-1].read_text(encoding="utf-8"))
-            print("=== SUMMARY ===")
+            newest = jsons[-1]
+            data = json.loads(newest.read_text(encoding="utf-8"))
+            print("=== SUMMARY ===", newest.name)
             print(json.dumps(data.get("summary", {}), ensure_ascii=False, indent=2))
         else:
             print("No transformers report downloaded.")

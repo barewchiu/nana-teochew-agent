@@ -14,6 +14,7 @@
 | [ASR_第0-2周看板.md](./ASR_第0-2周看板.md) | 路线 4 立刻可执行的两周任务清单 |
 | [ASR_Holdout评测.md](./ASR_Holdout评测.md) | Hold-out 评测命令（gold / groq / 潮语模型） |
 | [ASR_Holdout基线.md](./ASR_Holdout基线.md) | 首轮基线：gold 100% · groq 40.6% |
+| [ASR_AutoDL操作手册.md](./ASR_AutoDL操作手册.md) | AutoDL T4 一键评测步骤 |
 
 ## 归档（Phase 1 · Echo of Roots）
 

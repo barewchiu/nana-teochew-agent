@@ -357,9 +357,8 @@ INTENT_REPLIES: dict[str, dict[str, str]] = {
     "affection": {
         "reply": "阿嫲，我也想您啰，我在这里陪您，慢慢讲。",
         "reply_zh": "奶奶，我也想您，我在这里陪您，慢慢说。",
-        # 暂复用陪伴原声；可另录 affection.m4a 覆盖
-        "audio": "/audio/replies/thanks.m4a",
-        "note": "乡音回复包：想念/喜欢（暂用 thanks 原声）",
+        "audio": "/audio/replies/affection.m4a",
+        "note": "乡音回复包：想念/喜欢",
     },
     "thanks": {
         "reply": "阿嫲，我在这里，随时听您讲话。",

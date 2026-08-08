@@ -21,8 +21,8 @@
 
 ## 可选
 
-- 补录 `public/audio/replies/affection.m4a`（「我也想您…」）替换暂用的 thanks 原声  
-- 下一优先：**P3 短多轮记忆**，或准备提交材料  
+- [x] 已补录 `public/audio/replies/affection.m4a`（「我也想您…」）  
+- 下一优先：准备提交材料 / Hirebox 交卷  
 
 ## 历史摘要
 

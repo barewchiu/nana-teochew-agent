@@ -19,7 +19,7 @@ export const REPLY_VOICE_PACK = {
     replyZh: '爷爷在天上看着您，别哭，我陪您说。',
   },
   affection: {
-    audio: '/audio/replies/thanks.m4a',
+    audio: '/audio/replies/affection.m4a',
     reply: '阿嫲，我也想您啰，我在这里陪您，慢慢讲。',
     replyZh: '奶奶，我也想您，我在这里陪您，慢慢说。',
   },

@@ -28,6 +28,12 @@ MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
     ("天使祖年佬", "天气怎样", "weather"),
     ("祖年佬", "天气", "weather"),
     ("金质", "天气", "weather"),
+    # weather — round3
+    ("今次天时祖年", "今日天气怎样", "weather"),
+    ("天时祖年", "天气怎样", "weather"),
+    ("金字解天思祖念", "今日天气怎样", "weather"),
+    ("天思祖念", "天气", "weather"),
+    ("祖念", "天气", "weather"),
     # thanks
     ("这一下了铺的瓦", "谢谢你陪我", "thanks"),
     ("一下了铺的瓦", "谢谢你陪我", "thanks"),
@@ -63,9 +69,11 @@ MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
     ("哇!醒了!", "我想你", "affection"),
     ("哇！醒了！", "我想你", "affection"),
     ("哇 醒了了", "我想你", "affection"),
+    ("哇 醒了", "我想你", "affection"),
     ("醒了了", "我想你", "affection"),
     ("哇咪花了", "我喜欢你", "affection"),
     ("哇 咪花了", "我喜欢你", "affection"),
+    ("哇＞咪花了＞", "我喜欢你", "affection"),
     ("咪花了", "我喜欢你", "affection"),
     # eat
     ("乐加饱味", "哩食饱未", "eat"),
@@ -76,6 +84,12 @@ MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
     ("吃亚阿贝", "食药", "meds"),
     ("亚阿贝", "食药", "meds"),
     ("阿玛就吃", "阿嫲食药", "meds"),
+    # meds — round3「阿妈,爱吃亚伯。」
+    ("阿妈爱吃亚伯", "阿嫲爱食药未", "meds"),
+    ("爱吃亚伯", "食药未", "meds"),
+    ("吃亚伯", "食药", "meds"),
+    ("亚伯", "食药", "meds"),
+    ("阿妈爱吃", "阿嫲食药", "meds"),
     ("食若", "食药", "meds"),
     ("食钥", "食药", "meds"),
     ("吃药未", "食药未", "meds"),
@@ -175,6 +189,9 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "吃亚阿贝",
             "亚阿贝",
             "阿贝",
+            "吃亚伯",
+            "亚伯",
+            "阿妈爱吃",
         ),
     ),
     (
@@ -235,6 +252,10 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "金质",
             "祖年佬",
             "天使祖",
+            "天时祖年",
+            "天思祖念",
+            "祖念",
+            "今次天时",
         ),
     ),
     (

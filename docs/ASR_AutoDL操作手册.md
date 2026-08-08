@@ -2,6 +2,8 @@
 
 本机无 GPU 时，用仓库脚本一键跑 hold-out。
 
+实测零样本基线（2026-08-09）：`panlr/whisper-finetune-teochew` → **意图准确率 50%**（16/32），高于 Groq 40.6%。详见 [ASR_Holdout基线.md](./ASR_Holdout基线.md)。
+
 ## 你需要上传的只有一个 zip
 
 本机生成（在仓库根目录）：
@@ -10,7 +12,7 @@
 powershell -File teochew-asr/scripts/pack_holdout_for_autodl.ps1
 ```
 
-产物：`submit/holdout_audio.zip`（含 32 条录音 + manifest）
+产物：`data/asr/eval_holdout/holdout_audio.zip`（含 32 条录音 + manifest）
 
 ## AutoDL 上操作（约 3 步）
 
@@ -30,6 +32,28 @@ bash autodl_bootstrap.sh
 
 3. 看终端 `intent_accuracy`，然后控制台 **关机**。
 
-## SSH 交给 Cursor 代跑
+## 本机 SSH 一键代跑
 
-把实例页的 SSH 命令贴给 Agent（含主机和端口），并提供密码或密钥后，可由 Agent 远程执行同一套脚本。
+```powershell
+$env:AUTODL_SSH_HOST="region-9.autodl.pro"   # 以实例页为准
+$env:AUTODL_SSH_PORT="21779"                 # 以实例页为准
+$env:AUTODL_SSH_PASSWORD="****"
+$env:PYTHONIOENCODING="utf-8"
+python teochew-asr/scripts/run_autodl_eval.py
+```
+
+依赖：本机 `pip install paramiko`；远端自动装 `ffmpeg`、走 `HF_ENDPOINT=https://hf-mirror.com`。
+
+## 踩坑备忘
+
+| 问题 | 处理 |
+| --- | --- |
+| Windows zip 解压警告导致脚本退出 | bootstrap 容忍 `unzip` exit code 1 |
+| `huggingface.co` Errno 99 | 设 `HF_ENDPOINT=https://hf-mirror.com`，勿开 network_turbo |
+| m4a 读失败 | `eval_holdout.py` 用 librosa/ffmpeg 转 16k waveform |
+| 无 `python3` | 用 `/root/miniconda3/bin/python` |
+| 按量计费 | 评测完立刻 **关机** |
+
+## 下一步
+
+L1 非 holdout 约 36 条微调同一模型，目标 holdout 意图准确率 **≥70%**。

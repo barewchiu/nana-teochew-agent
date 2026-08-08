@@ -68,11 +68,13 @@ npm run pack:submit
 ## 4. 提交前检查清单
 
 - [x] 体验链接公网可开  
-- [ ] DEMO 三键可点、有声音  
-- [ ] LIVE 模式能返回 AI/知识库回复（Key 已配置）  
-- [ ] ZIP 已重新打包且无密钥  
-- [ ] 头像已备（`submit/nana-agent-avatar.png`）  
+- [ ] DEMO 三键可点、有声音（评委路径优先用场景快捷钮，LIVE 作加分）  
+- [ ] LIVE 模式能返回 AI/知识库回复（Key 已配置；现网仍为 Groq 耳）  
+- [ ] ZIP 已重新打包且无密钥（`npm run pack:submit`）  
+- [ ] 头像已备（从 `nana-agent/public/avatar.png` 复制为 `submit/nana-agent-avatar.png`）  
 - [ ] 勾选原创承诺后提交  
+
+> 潮语 ASR 长期路线 holdout 基线：Groq 40.6% / 开源潮语 Whisper 50%。演示勿依赖未上线的专用 ASR。
 
 ---
 

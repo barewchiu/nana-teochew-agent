@@ -31,15 +31,44 @@ else
 fi
 
 echo "== python deps =="
-pip install -U pip
-pip install -U "transformers>=4.40" accelerate librosa soundfile
+export PATH="/root/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin${PATH:+:$PATH}"
+if [[ -x /root/miniconda3/bin/python ]]; then
+  PY=/root/miniconda3/bin/python
+elif command -v python >/dev/null 2>&1; then
+  PY=python
+elif command -v python3 >/dev/null 2>&1; then
+  PY=python3
+else
+  echo "ERROR: python not found"; exit 1
+fi
+echo "using $PY ($($PY -V))"
+if ! command -v ffmpeg >/dev/null 2>&1; then
+  echo "== install ffmpeg =="
+  if command -v apt-get >/dev/null 2>&1; then
+    apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
+  elif command -v conda >/dev/null 2>&1; then
+    conda install -y -c conda-forge ffmpeg
+  else
+    echo "ERROR: ffmpeg missing and no apt-get/conda"; exit 1
+  fi
+fi
+command -v ffmpeg
+$PY -m pip install -q "transformers>=4.40" accelerate librosa soundfile
 
 HOLDOUT_DIR="$REPO_DIR/data/asr/eval_holdout"
 mkdir -p "$HOLDOUT_DIR/audio" "$HOLDOUT_DIR/reports"
 
 if [[ -f "$HOLDOUT_ZIP" ]]; then
   echo "== unpack holdout audio from $HOLDOUT_ZIP =="
-  unzip -o "$HOLDOUT_ZIP" -d "$WORKDIR/_holdout_unpack"
+  # Windows Compress-Archive zips often warn about backslashes; unzip exits 1 on warning.
+  unzip -o "$HOLDOUT_ZIP" -d "$WORKDIR/_holdout_unpack" || {
+    rc=$?
+    if [[ "$rc" -gt 1 ]]; then
+      echo "ERROR: unzip failed with code $rc"
+      exit "$rc"
+    fi
+    echo "(unzip warning ignored, code=$rc)"
+  }
   # accept either audio/*.m4a at root or nested paths
   find "$WORKDIR/_holdout_unpack" -type f \( -name '*.m4a' -o -name '*.mp3' -o -name '*.wav' \) -exec cp -f {} "$HOLDOUT_DIR/audio/" \;
   if [[ -f "$WORKDIR/_holdout_unpack/manifest.csv" ]]; then
@@ -63,7 +92,11 @@ fi
 
 echo "== run eval =="
 cd "$REPO_DIR"
-python teochew-asr/scripts/eval_holdout.py --backend transformers --model "$MODEL"
+# AutoDL often cannot reach huggingface.co; prefer China mirror.
+export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
+export HF_HUB_ENABLE_HF_TRANSFER="${HF_HUB_ENABLE_HF_TRANSFER:-0}"
+echo "HF_ENDPOINT=$HF_ENDPOINT"
+$PY teochew-asr/scripts/eval_holdout.py --backend transformers --model "$MODEL"
 
 echo "== latest report =="
 ls -lt "$HOLDOUT_DIR/reports" | head -n 5

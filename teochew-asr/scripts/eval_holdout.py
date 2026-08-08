@@ -117,6 +117,14 @@ def asr_http(audio_path: Path, base_url: str) -> tuple[str, float]:
 _pipe = None
 
 
+def _load_audio_16k(audio_path: Path):
+    """Load any ffmpeg-readable format to mono float32 @16k (m4a needs ffmpeg)."""
+    import librosa
+
+    wav, _sr = librosa.load(str(audio_path), sr=16000, mono=True)
+    return wav
+
+
 def asr_transformers(audio_path: Path, model_id: str) -> tuple[str, float]:
     global _pipe
     if _pipe is None:
@@ -131,7 +139,10 @@ def asr_transformers(audio_path: Path, model_id: str) -> tuple[str, float]:
             device=device,
             torch_dtype=torch.float16 if device == 0 else torch.float32,
         )
-    result = _pipe(str(audio_path))
+    # Pass waveform so m4a/mp3 work (soundfile alone cannot decode m4a).
+    # Do not pass language/task — panlr checkpoint has an outdated generation_config.
+    wav = _load_audio_16k(audio_path)
+    result = _pipe({"array": wav, "sampling_rate": 16000})
     text = str(result.get("text") if isinstance(result, dict) else result or "").strip()
     return text, 0.7 if text else 0.0
 

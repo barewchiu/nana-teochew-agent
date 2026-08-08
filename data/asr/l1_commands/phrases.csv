@@ -4,7 +4,7 @@ eat_02,eat,食饱未？,吃饱了吗？,high
 eat_03,eat,有食未？,吃了吗？,high
 eat_04,eat,肚饿,肚子饿,medium
 eat_05,eat,爱食糜未？,要吃粥吗？,medium
-meds_01,meds,阿嫲爱食药未？,奶奶吃药了吗？,high
+meds_01,meds,阿嫲爱食药未？,奶奶要吃药了吗？,high
 meds_02,meds,食药未？,吃药了吗？,high
 meds_03,meds,药食未？,药吃了吗？,high
 meds_04,meds,爱准时食药,要按时吃药,medium

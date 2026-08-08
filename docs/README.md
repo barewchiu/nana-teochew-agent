@@ -12,6 +12,8 @@
 | [P4场景快捷钮.md](./P4场景快捷钮.md) | 第四步：演示用场景快捷钮（不依赖麦克风） |
 | [ASR_路线4_长期方案.md](./ASR_路线4_长期方案.md) | 潮语 ASR：自建数据 + 微调长期方案 |
 | [ASR_第0-2周看板.md](./ASR_第0-2周看板.md) | 路线 4 立刻可执行的两周任务清单 |
+| [ASR_Holdout评测.md](./ASR_Holdout评测.md) | Hold-out 评测命令（gold / groq / 潮语模型） |
+| [ASR_Holdout基线.md](./ASR_Holdout基线.md) | 首轮基线：gold 100% · groq 40.6% |
 
 ## 归档（Phase 1 · Echo of Roots）
 

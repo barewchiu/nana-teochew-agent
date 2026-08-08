@@ -30,3 +30,4 @@ data/asr/**/audio/**
 teochew-asr/.cache/
 teochew-asr/checkpoints/
 teochew-asr/**/__pycache__/
+data/asr/eval_holdout/reports/

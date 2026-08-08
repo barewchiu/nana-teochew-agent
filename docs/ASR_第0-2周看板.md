@@ -20,8 +20,9 @@
 
 - [ ] L1 有效条数 ≥ **400**（或至少覆盖 phrases 全表 × 2 说话人）
 - [ ] manifest 无空 `text_teochew` / `intent`
-- [ ] 用 `python teochew-asr/scripts/check_manifest.py` 检查
-- [ ] 选定基座模型，记下零样本听感（家人试 20 句）
+- [x] 用 `python teochew-asr/scripts/check_manifest.py` 检查
+- [x] Hold-out 评测脚本已接通；groq 基线 40.6%，gold 100%
+- [ ] 选定基座模型，在 GPU 上跑 `eval_holdout.py --backend transformers`
 
 ## 第 2 周 · 第一次微调准备
 

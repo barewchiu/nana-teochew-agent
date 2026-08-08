@@ -193,6 +193,9 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "吃亚伯",
             "亚伯",
             "阿妈爱吃",
+            "食了",
+            "还没食",
+            "药食未",
         ),
     ),
     (
@@ -294,6 +297,8 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "心态",
             "难受",
             "有疾",
+            "头壳痛",
+            "头壳",
         ),
     ),
     (

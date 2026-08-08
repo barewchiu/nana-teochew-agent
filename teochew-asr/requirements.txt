@@ -1,7 +1,8 @@
 fastapi>=0.110.0
 uvicorn[standard]>=0.27.0
 python-multipart>=0.0.9
-httpx>=0.27.0
+httpx[socks]>=0.27.0
+socksio>=1.0.0
 
 # Optional — only for TEOCHEW_ASR_MODE=transformers (GPU recommended)
 # torch

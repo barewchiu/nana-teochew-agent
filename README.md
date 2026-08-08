@@ -8,12 +8,14 @@ EazO 黑客松项目：**阿嫲的小管家（Nana Teochew Agent）**。
 ```
 奶奶的乡音管家/
 ├── nana-agent/                 # 可运行 Web App（当前产品）
-├── docs/
-│   ├── Pivot_To_Nana_Agent.md  # 转型指令
-│   ├── Nana_Agent_实施指南.md  # 分步实施参考
-│   └── archive/phase1/         # 旧 Echo of Roots 文档
-└── data/                       # 潮汕语料源（词汇表 / 50句对话）
+├── teochew-asr/                # 潮语 ASR 微服务（路线 4）
+├── docs/                       # 方案与提交文档
+└── data/
+    ├── …                       # 潮汕语料源（词汇表 / 对话）
+    └── asr/                    # 潮语 ASR 录音与标注（L1/L2/hold-out）
 ```
+
+潮语识别长期方案：[`docs/ASR_路线4_长期方案.md`](docs/ASR_路线4_长期方案.md) · 本周看板：[`docs/ASR_第0-2周看板.md`](docs/ASR_第0-2周看板.md)
 
 ## 快速开始
 

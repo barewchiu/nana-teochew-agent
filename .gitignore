@@ -23,3 +23,10 @@ echo-of-roots/
 
 # Full-length opera masters (keep local only; deploy uses short previews)
 nana-agent/public/audio_full_local/
+
+# Teochew ASR raw recordings / model weights (privacy + size)
+data/asr/**/audio/**
+!data/asr/**/audio/.gitkeep
+teochew-asr/.cache/
+teochew-asr/checkpoints/
+teochew-asr/**/__pycache__/

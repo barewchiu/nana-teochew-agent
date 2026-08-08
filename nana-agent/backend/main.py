@@ -47,6 +47,9 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "").strip()
 GROQ_WHISPER_MODEL = os.getenv("GROQ_WHISPER_MODEL", "whisper-large-v3-turbo")
 GROQ_CHAT_MODEL = os.getenv("GROQ_CHAT_MODEL", "llama-3.3-70b-versatile")
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+# Optional Teochew ASR microservice (Route 4). Empty = Groq only.
+TEOCHEW_ASR_URL = os.getenv("TEOCHEW_ASR_URL", "").strip().rstrip("/")
+TEOCHEW_ASR_MIN_CONF = float(os.getenv("TEOCHEW_ASR_MIN_CONF", "0.35") or "0.35")
 
 app = FastAPI(title="Nana Teochew Agent API", version="0.3.0")
 app.add_middleware(
@@ -181,6 +184,40 @@ async def llm_complete(messages: list[dict[str, str]], temperature: float = 0.7)
     return resp.json()["choices"][0]["message"]["content"]
 
 
+async def transcribe_with_teochew_asr(
+    audio_bytes: bytes, filename: str, content_type: str
+) -> dict[str, Any] | None:
+    """Call Route-4 teochew-asr service. Returns None to trigger Groq fallback."""
+    if not TEOCHEW_ASR_URL:
+        return None
+    suffix = Path(filename or "audio.webm").suffix or ".webm"
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            files = {
+                "audio": (
+                    filename or f"audio{suffix}",
+                    audio_bytes,
+                    content_type or "audio/webm",
+                ),
+            }
+            resp = await client.post(f"{TEOCHEW_ASR_URL}/v1/transcribe", files=files)
+        if resp.status_code >= 400:
+            return None
+        payload = resp.json()
+        text = str(payload.get("text") or "").strip()
+        conf = float(payload.get("confidence") or 0.0)
+        if not text or conf < TEOCHEW_ASR_MIN_CONF:
+            return None
+        return {
+            "text": text,
+            "confidence": conf,
+            "backend": str(payload.get("backend") or "teochew-asr"),
+            "model": str(payload.get("model") or ""),
+        }
+    except Exception:
+        return None
+
+
 async def transcribe_with_groq(audio_bytes: bytes, filename: str, content_type: str) -> str:
     _require_groq()
     suffix = Path(filename or "audio.webm").suffix or ".webm"
@@ -222,6 +259,20 @@ async def transcribe_with_groq(audio_bytes: bytes, filename: str, content_type: 
             os.unlink(tmp_path)
         except OSError:
             pass
+
+
+async def transcribe_audio(
+    audio_bytes: bytes, filename: str, content_type: str
+) -> tuple[str, str]:
+    """Prefer Teochew ASR when configured; fallback to Groq Whisper.
+
+    Returns (transcript, asr_backend).
+    """
+    teo = await transcribe_with_teochew_asr(audio_bytes, filename, content_type)
+    if teo and teo.get("text"):
+        return str(teo["text"]), str(teo.get("backend") or "teochew-asr")
+    text = await transcribe_with_groq(audio_bytes, filename, content_type)
+    return text, "groq"
 
 
 CHAT_SYSTEM = """你现在是「阿嫲的小管家」，专门陪伴一位只会潮汕话的奶奶（阿芳奶奶）。
@@ -387,6 +438,8 @@ async def health() -> dict[str, Any]:
         "mentor_ask": bool(DEEPSEEK_API_KEY or GROQ_API_KEY or TEOCHEW_LEXICON),
         "teochew_lexicon": len(TEOCHEW_LEXICON),
         "teochew_dialogues": len(TEOCHEW_DIALOGUES),
+        "teochew_asr": bool(TEOCHEW_ASR_URL),
+        "teochew_asr_url": TEOCHEW_ASR_URL or "",
     }
 
 
@@ -491,7 +544,7 @@ async def chat(
     history_turns = parse_chat_history(history)
     last_intent = last_intent_from_history(history_turns)
     history_prompt = format_history_for_prompt(history_turns)
-    raw_transcript = await transcribe_with_groq(
+    raw_transcript, asr_backend = await transcribe_audio(
         audio_bytes,
         audio.filename or "recording.webm",
         audio.content_type or "audio/webm",
@@ -596,6 +649,7 @@ async def chat(
             "corrected": transcript if transcript != raw_transcript else "",
             "memory_topic": memory_topic,
             "followup": bool(grounded.get("followup")),
+            "asr_backend": asr_backend,
         }
 
     llm = await chat_with_llm(
@@ -635,6 +689,7 @@ async def chat(
         "corrected": transcript if transcript != raw_transcript else "",
         "memory_topic": memory_topic_label(intent_id or last_intent),
         "followup": False,
+        "asr_backend": asr_backend,
     }
 
 

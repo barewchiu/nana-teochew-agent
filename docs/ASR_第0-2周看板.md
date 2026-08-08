@@ -12,7 +12,7 @@
   例：`eat_01_bafang_1.m4a`
 - [ ] 音频放进 `data/asr/l1_commands/audio/`
 - [ ] 每录一条，在 `data/asr/l1_commands/manifest.csv` 加一行
-- [ ] 从 L1 里**抽出 30 句**拷到 `eval_holdout/`（之后禁止拿去训练）
+- [x] 从 L1 里**抽出 32 条**拷到 `eval_holdout/`（16 phrase × 2 说话人；之后禁止拿去训练）
 - [ ] 本地启动 `teochew-asr`（可先 mock 模式跑通接口）
 - [ ] `nana-agent/.env` 配置 `TEOCHEW_ASR_URL` 做联调
 

@@ -16,7 +16,13 @@ import {
 } from './lib/voiceEchoMapping';
 import { operaStations } from './lib/operaStations';
 import { apiUrl } from './lib/api';
-import { CHAT_TURNS, resolveChatAudio } from './lib/chatKb';
+import {
+  CHAT_TURNS,
+  FOLLOWUP_BUTTONS,
+  INTENT_TOPIC_LABELS,
+  SCENE_BUTTONS,
+  resolveChatAudio,
+} from './lib/chatKb';
 
 /** Modes: HOME | MSG | CHAT | OPERA */
 const BAR_COUNT = 7;
@@ -86,6 +92,7 @@ function App() {
   const [showReminder, setShowReminder] = useState(false);
   const [playHint, setPlayHint] = useState('');
   const [memoryTopic, setMemoryTopic] = useState('');
+  const [memoryIntent, setMemoryIntent] = useState('');
 
   const audioRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -271,6 +278,7 @@ function App() {
     setRadioLive(false);
     setPlayHint('');
     setMemoryTopic('');
+    setMemoryIntent('');
   };
 
   const openMessages = () => {
@@ -303,6 +311,7 @@ function App() {
     setPendingReply(null);
     setPlayHint('');
     setMemoryTopic('');
+    setMemoryIntent('');
     if (messages.length === 0) {
       setMessages([
         {
@@ -436,21 +445,15 @@ function App() {
     addMessage('ai', replyPayload.reply, replyPayload.replyZh, {
       intent: replyPayload.intent || '',
     });
-    if (replyPayload.memoryTopic) {
+    if (replyPayload.intent) {
+      setMemoryIntent(replyPayload.intent);
+      setMemoryTopic(
+        replyPayload.memoryTopic ||
+          INTENT_TOPIC_LABELS[replyPayload.intent] ||
+          '',
+      );
+    } else if (replyPayload.memoryTopic) {
       setMemoryTopic(replyPayload.memoryTopic);
-    } else if (replyPayload.intent) {
-      const labels = {
-        eat: '吃饭',
-        meds: '吃药',
-        miss_family: '想阿公',
-        affection: '想念陪伴',
-        thanks: '道谢',
-        weather: '天气',
-        opera: '潮剧',
-        health: '身体',
-        grandson: '孙子',
-      };
-      setMemoryTopic(labels[replyPayload.intent] || '');
     }
     setStatus('responding');
     if (advanceDemoTurn) {
@@ -472,6 +475,31 @@ function App() {
     }
   };
 
+  const runSceneButton = (scene) => {
+    if (!scene || status === 'thinking' || status === 'listening') return;
+    stopAudio();
+    setMicError('');
+    setPendingReply(null);
+    setStatus('thinking');
+    if (thinkTimerRef.current) clearTimeout(thinkTimerRef.current);
+    thinkTimerRef.current = setTimeout(() => {
+      addMessage('user', scene.recognized, scene.recognizedZh, {
+        intent: scene.intent || '',
+      });
+      applyReply({
+        reply: scene.reply,
+        replyZh: scene.replyZh,
+        audio: scene.audio,
+        recognized: scene.recognized,
+        recognizedZh: scene.recognizedZh,
+        intent: scene.intent || '',
+        memoryTopic: scene.topic || INTENT_TOPIC_LABELS[scene.intent] || '',
+        source: scene.followup ? 'kb+memory' : 'kb',
+        followup: Boolean(scene.followup),
+      });
+    }, 500);
+  };
+
   const runDemoFlow = () => {
     setStatus('thinking');
     if (thinkTimerRef.current) clearTimeout(thinkTimerRef.current);
@@ -488,17 +516,8 @@ function App() {
           recognized: turn.recognized,
           recognizedZh: turn.recognizedZh,
           intent: turn.intent || '',
-          memoryTopic: {
-            eat: '吃饭',
-            meds: '吃药',
-            miss_family: '想阿公',
-            affection: '想念陪伴',
-            thanks: '道谢',
-            weather: '天气',
-            opera: '潮剧',
-            health: '身体',
-            grandson: '孙子',
-          }[turn.intent] || '',
+          memoryTopic: INTENT_TOPIC_LABELS[turn.intent] || '',
+          source: 'kb',
         },
         { advanceDemoTurn: true },
       );
@@ -853,6 +872,40 @@ function App() {
               小管家记得：刚才在讲「{memoryTopic}」
             </p>
           )}
+
+          <div className="mb-4">
+            <p className="mb-2 text-center text-base font-bold text-nana-ink/80">
+              场景快捷钮 · 一点就听懂（演示稳）
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {SCENE_BUTTONS.map((scene) => (
+                <button
+                  key={scene.id}
+                  type="button"
+                  disabled={status === 'thinking' || status === 'listening'}
+                  onClick={() => runSceneButton(scene)}
+                  className="rounded-2xl border-2 border-orange-200 bg-white px-3 py-3 text-xl font-bold text-nana-ink shadow-sm transition active:scale-95 disabled:opacity-50"
+                >
+                  {scene.label}
+                </button>
+              ))}
+            </div>
+            {memoryIntent && FOLLOWUP_BUTTONS[memoryIntent]?.length > 0 && (
+              <div className="mt-2 flex flex-wrap justify-center gap-2">
+                {FOLLOWUP_BUTTONS[memoryIntent].map((btn) => (
+                  <button
+                    key={btn.id}
+                    type="button"
+                    disabled={status === 'thinking' || status === 'listening'}
+                    onClick={() => runSceneButton(btn)}
+                    className="rounded-2xl border-2 border-emerald-300 bg-emerald-50 px-4 py-2 text-lg font-bold text-emerald-900 disabled:opacity-50"
+                  >
+                    接着说：{btn.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {messages.length > 0 && (
             <div className="mb-4 max-h-44 space-y-3 overflow-y-auto rounded-2xl border-2 border-orange-200/80 bg-white/85 p-4">

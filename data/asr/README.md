@@ -19,8 +19,9 @@ data/asr/
 ## 立刻开始
 
 1. 打开 `l1_commands/phrases.csv`  
-2. 用潮汕话逐句录到 `l1_commands/audio/`  
-3. 在 `l1_commands/manifest.csv` 追加一行  
+2. 用潮汕话逐句录到 `l1_commands/audio/`（`m4a` / `mp3` / `wav` 均可）  
+3. 命名：`{phrase_id}_{speaker}_{take}.ext`，如 `eat_01_family2_1.mp3`  
+4. 更新 `l1_commands/manifest.csv`（或让开发按目录重扫生成）  
 
 校验：
 

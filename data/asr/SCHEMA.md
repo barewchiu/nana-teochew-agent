@@ -3,7 +3,7 @@
 | 字段 | 必填 | 说明 |
 | --- | --- | --- |
 | id | 是 | 唯一 ID，如 `eat_01_bafang_1` |
-| audio_path | 是 | 相对 `manifest.csv` 所在目录，如 `audio/eat_01_bafang_1.m4a` |
+| audio_path | 是 | 相对 `manifest.csv` 所在目录，如 `audio/eat_01_family1_1.m4a`；扩展名可用 `m4a` / `mp3` / `wav` |
 | phrase_id | 是 | 对应 `phrases.csv` 的 id |
 | text_teochew | 是 | 潮语文本（与口播一致） |
 | text_zh | 是 | 普通话意思 |

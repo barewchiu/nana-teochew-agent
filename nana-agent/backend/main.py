@@ -77,10 +77,15 @@ try:
         INTENT_IDS,
         WHISPER_TEOCHEW_PROMPT,
         correct_mishear,
+        format_history_for_prompt,
         grounded_from_intent,
+        last_intent_from_history,
         lexicon_glossary,
         match_dialogue,
+        match_followup,
         match_intent,
+        memory_topic_label,
+        parse_chat_history,
         top_dialogue_hints,
     )
 except ImportError:  # running as script / flat module
@@ -88,10 +93,15 @@ except ImportError:  # running as script / flat module
         INTENT_IDS,
         WHISPER_TEOCHEW_PROMPT,
         correct_mishear,
+        format_history_for_prompt,
         grounded_from_intent,
+        last_intent_from_history,
         lexicon_glossary,
         match_dialogue,
+        match_followup,
         match_intent,
+        memory_topic_label,
+        parse_chat_history,
         top_dialogue_hints,
     )
 
@@ -222,6 +232,7 @@ CHAT_SYSTEM = """你现在是「阿嫲的小管家」，专门陪伴一位只会
 4. 禁止生硬科技术语；听不清就说「阿嫲，您再说一遍，我没听清」。
 5. Whisper 转写常把潮汕话听成怪普通话，请结合「参考乡音例句」善意推断意图。
 6. 若参考例句高度相关，reply 优先改写自参考潮句，不要写成书面普通话。
+7. 若提供「刚才对话」，要承接上文，不要当作全新话题；短答（好/嗯/食了）要结合上一轮意图理解。
 
 请严格只输出一段 JSON（不要 markdown），字段：
 {
@@ -282,11 +293,18 @@ INTENT_CLASSIFY_SYSTEM = """你是潮汕话陪护助手的「意图分类器」�
 }"""
 
 
-async def classify_intent_with_llm(transcript: str) -> dict[str, str]:
+async def classify_intent_with_llm(
+    transcript: str, history_prompt: str = "", last_intent: str = ""
+) -> dict[str, str]:
+    user = f"语音识别结果：{transcript}"
+    if last_intent:
+        user += f"\n上一轮意图：{last_intent}（{memory_topic_label(last_intent)}）"
+    if history_prompt:
+        user += f"\n刚才对话：\n{history_prompt}"
     content = await llm_complete(
         [
             {"role": "system", "content": INTENT_CLASSIFY_SYSTEM},
-            {"role": "user", "content": f"语音识别结果：{transcript}"},
+            {"role": "user", "content": user},
         ],
         temperature=0.1,
     )
@@ -307,6 +325,8 @@ async def chat_with_llm(
     dialect: str = "teochew",
     target_word_zh: str = "",
     rag_hints: list[dict[str, str]] | None = None,
+    history_prompt: str = "",
+    last_intent: str = "",
 ) -> dict[str, str]:
     dialect_label = DIALECT_NAMES.get(dialect, "潮汕话")
     base = HERITAGE_SYSTEM if heritage else CHAT_SYSTEM
@@ -321,6 +341,12 @@ async def chat_with_llm(
         )
     else:
         user_content = f"语音识别结果：{transcript}"
+        if last_intent:
+            user_content += (
+                f"\n上一轮话题：{memory_topic_label(last_intent) or last_intent}"
+            )
+        if history_prompt:
+            user_content += f"\n刚才对话：\n{history_prompt}"
         if rag_hints:
             lines = [
                 f"- {h.get('teochew')}（普通话：{h.get('mandarin')}）"
@@ -453,6 +479,7 @@ async def chat(
     heritage: str = Form("false"),
     dialect: str = Form("teochew"),
     target_word_zh: str = Form(""),
+    history: str = Form("[]"),
 ) -> dict[str, Any]:
     _require_groq()
     audio_bytes = await audio.read()
@@ -461,6 +488,9 @@ async def chat(
 
     is_heritage = heritage.lower() in {"1", "true", "yes", "on"}
     dialect_id = (dialect or "teochew").strip().lower()
+    history_turns = parse_chat_history(history)
+    last_intent = last_intent_from_history(history_turns)
+    history_prompt = format_history_for_prompt(history_turns)
     raw_transcript = await transcribe_with_groq(
         audio_bytes,
         audio.filename or "recording.webm",
@@ -477,25 +507,39 @@ async def chat(
     grounded: dict[str, Any] | None = None
     rag_hints: list[dict[str, str]] = []
     if not is_heritage and dialect_id == "teochew":
+        follow = match_followup(transcript, last_intent) or match_followup(
+            raw_transcript, last_intent
+        )
+        fresh: dict[str, Any] | None = None
         if mishear.get("intent"):
-            grounded = grounded_from_intent(
+            fresh = grounded_from_intent(
                 str(mishear["intent"]),
                 note_extra=mishear_note or "错读表直接命中",
             )
-        if not grounded:
-            grounded = match_intent(transcript) or match_intent(raw_transcript)
+        if not fresh:
+            fresh = match_intent(transcript) or match_intent(raw_transcript)
+
+        # Same-topic short continuation prefers follow-up copy; new intent switches topic
+        if follow and not fresh:
+            grounded = follow
+        elif follow and fresh and fresh.get("intent") == last_intent:
+            grounded = follow
+        else:
+            grounded = fresh or follow
+
         if not grounded:
             grounded = match_dialogue(transcript, TEOCHEW_DIALOGUES)
             if not grounded and transcript != raw_transcript:
                 grounded = match_dialogue(raw_transcript, TEOCHEW_DIALOGUES)
-        # Still nothing → LLM forced into 8 intents (then play voice pack)
+        # Still nothing → LLM forced into intents (then play voice pack)
         if not grounded:
             try:
                 classified = await classify_intent_with_llm(
-                    f"{raw_transcript}\n（纠正候选：{transcript}）"
+                    f"{raw_transcript}\n（纠正候选：{transcript}）",
+                    history_prompt=history_prompt,
+                    last_intent=last_intent,
                 )
                 conf = classified.get("confidence") or "low"
-                # Dialect ASR free-chat is usually worse; accept classified intents
                 if classified.get("intent") in INTENT_IDS:
                     grounded = grounded_from_intent(
                         classified["intent"],
@@ -507,22 +551,30 @@ async def chat(
                 grounded = None
         rag_hints = top_dialogue_hints(transcript, TEOCHEW_DIALOGUES, k=4)
 
+    memory_topic = memory_topic_label(
+        str(grounded.get("intent") or last_intent) if grounded else last_intent
+    )
+
     # Strong intent hit → return KB reply (with optional LLM polish of transcript_zh only)
     if grounded and not is_heritage and (
         grounded.get("intent") != "dialogue" or float(grounded.get("score") or 0) >= 0.42
     ):
         transcript_zh = grounded.pop("_transcript_zh", None) or transcript
-        try:
-            soft = await chat_with_llm(
-                f"{raw_transcript}（理解为：{transcript}）",
-                False,
-                dialect_id,
-                "",
-                rag_hints=rag_hints,
-            )
-            transcript_zh = soft.get("transcript_zh") or transcript_zh
-        except Exception:
-            pass
+        # Follow-ups already have contextual copy; skip LLM rewrite of reply
+        if not grounded.get("followup"):
+            try:
+                soft = await chat_with_llm(
+                    f"{raw_transcript}（理解为：{transcript}）",
+                    False,
+                    dialect_id,
+                    "",
+                    rag_hints=rag_hints,
+                    history_prompt=history_prompt,
+                    last_intent=last_intent,
+                )
+                transcript_zh = soft.get("transcript_zh") or transcript_zh
+            except Exception:
+                pass
         note = grounded.get("note") or ""
         if mishear_note and mishear_note not in note:
             note = f"{note}；{mishear_note}" if note else mishear_note
@@ -540,8 +592,10 @@ async def chat(
             "mode": "chat",
             "dialect": dialect_id,
             "brain": "knowledge-base",
-            "source": "kb",
+            "source": "kb+memory" if grounded.get("followup") else "kb",
             "corrected": transcript if transcript != raw_transcript else "",
+            "memory_topic": memory_topic,
+            "followup": bool(grounded.get("followup")),
         }
 
     llm = await chat_with_llm(
@@ -550,6 +604,8 @@ async def chat(
         dialect_id,
         target_word_zh.strip(),
         rag_hints=None if is_heritage else rag_hints,
+        history_prompt="" if is_heritage else history_prompt,
+        last_intent="" if is_heritage else last_intent,
     )
 
     # Attach audio if a weaker intent still matched keywords
@@ -577,6 +633,8 @@ async def chat(
         "brain": _brain_name(),
         "source": "ai+rag" if rag_hints else "ai",
         "corrected": transcript if transcript != raw_transcript else "",
+        "memory_topic": memory_topic_label(intent_id or last_intent),
+        "followup": False,
     }
 
 

@@ -85,6 +85,7 @@ function App() {
   const [radioLive, setRadioLive] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
   const [playHint, setPlayHint] = useState('');
+  const [memoryTopic, setMemoryTopic] = useState('');
 
   const audioRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -95,6 +96,7 @@ function App() {
   const messagesEndRef = useRef(null);
   const turnIndexRef = useRef(0);
   const liveModeRef = useRef(false);
+  const messagesRef = useRef([]);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const rafRef = useRef(null);
@@ -108,6 +110,10 @@ function App() {
   useEffect(() => {
     liveModeRef.current = isLiveMode;
   }, [isLiveMode]);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   useEffect(() => {
     const audio = new Audio();
@@ -264,6 +270,7 @@ function App() {
     setActiveClip(null);
     setRadioLive(false);
     setPlayHint('');
+    setMemoryTopic('');
   };
 
   const openMessages = () => {
@@ -295,6 +302,7 @@ function App() {
     setMicError('');
     setPendingReply(null);
     setPlayHint('');
+    setMemoryTopic('');
     if (messages.length === 0) {
       setMessages([
         {
@@ -410,16 +418,40 @@ function App() {
     });
   };
 
-  const addMessage = (role, text, translation) => {
+  const addMessage = (role, text, translation, extra = {}) => {
     setMessages((prev) => [
       ...prev,
-      { id: `${Date.now()}-${Math.random()}`, role, text, translation },
+      {
+        id: `${Date.now()}-${Math.random()}`,
+        role,
+        text,
+        translation,
+        intent: extra.intent || '',
+      },
     ]);
   };
 
   const applyReply = (replyPayload, { advanceDemoTurn = false } = {}) => {
     setPendingReply(replyPayload);
-    addMessage('ai', replyPayload.reply, replyPayload.replyZh);
+    addMessage('ai', replyPayload.reply, replyPayload.replyZh, {
+      intent: replyPayload.intent || '',
+    });
+    if (replyPayload.memoryTopic) {
+      setMemoryTopic(replyPayload.memoryTopic);
+    } else if (replyPayload.intent) {
+      const labels = {
+        eat: '吃饭',
+        meds: '吃药',
+        miss_family: '想阿公',
+        affection: '想念陪伴',
+        thanks: '道谢',
+        weather: '天气',
+        opera: '潮剧',
+        health: '身体',
+        grandson: '孙子',
+      };
+      setMemoryTopic(labels[replyPayload.intent] || '');
+    }
     setStatus('responding');
     if (advanceDemoTurn) {
       const next = (turnIndexRef.current + 1) % CHAT_TURNS.length;
@@ -445,7 +477,9 @@ function App() {
     if (thinkTimerRef.current) clearTimeout(thinkTimerRef.current);
     thinkTimerRef.current = setTimeout(() => {
       const turn = CHAT_TURNS[turnIndexRef.current];
-      addMessage('user', turn.recognized, turn.recognizedZh);
+      addMessage('user', turn.recognized, turn.recognizedZh, {
+        intent: turn.intent || '',
+      });
       applyReply(
         {
           reply: turn.reply,
@@ -453,6 +487,18 @@ function App() {
           audio: turn.audio,
           recognized: turn.recognized,
           recognizedZh: turn.recognizedZh,
+          intent: turn.intent || '',
+          memoryTopic: {
+            eat: '吃饭',
+            meds: '吃药',
+            miss_family: '想阿公',
+            affection: '想念陪伴',
+            thanks: '道谢',
+            weather: '天气',
+            opera: '潮剧',
+            health: '身体',
+            grandson: '孙子',
+          }[turn.intent] || '',
         },
         { advanceDemoTurn: true },
       );
@@ -463,10 +509,21 @@ function App() {
     setStatus('thinking');
     setMicError('');
     try {
+      const history = messagesRef.current
+        .filter((m) => m.role === 'user' || m.role === 'ai')
+        .slice(-6)
+        .map((m) => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          text: m.text || '',
+          text_zh: m.translation || '',
+          intent: m.intent || '',
+        }));
+
       const form = new FormData();
       form.append('audio', blob, 'recording.webm');
       form.append('heritage', 'false');
       form.append('dialect', 'teochew');
+      form.append('history', JSON.stringify(history));
 
       const resp = await fetch(apiUrl('/api/chat'), { method: 'POST', body: form });
       const data = await resp.json().catch(() => ({}));
@@ -496,6 +553,8 @@ function App() {
         note: data.note,
         intent: data.intent,
         source: data.source,
+        memoryTopic: data.memory_topic || '',
+        followup: data.followup,
       });
     } catch (err) {
       console.error(err);
@@ -789,6 +848,12 @@ function App() {
             </button>
           </div>
 
+          {memoryTopic && (
+            <p className="mb-3 text-center text-lg font-bold text-emerald-800">
+              小管家记得：刚才在讲「{memoryTopic}」
+            </p>
+          )}
+
           {messages.length > 0 && (
             <div className="mb-4 max-h-44 space-y-3 overflow-y-auto rounded-2xl border-2 border-orange-200/80 bg-white/85 p-4">
               {messages.map((m) => (
@@ -860,9 +925,12 @@ function App() {
 
           {status === 'responding' && pendingReply && (
             <div className="mb-4 rounded-3xl border-4 border-nana-warm bg-white p-6 shadow-md">
-              {pendingReply.source === 'kb' && (
+              {(pendingReply.source === 'kb' ||
+                pendingReply.source === 'kb+memory') && (
                 <p className="mb-2 text-sm font-bold text-emerald-700">
-                  乡音回复包 · 用熟悉的话回您
+                  {pendingReply.followup
+                    ? '接着刚才说 · 短多轮记忆'
+                    : '乡音回复包 · 用熟悉的话回您'}
                 </p>
               )}
               {pendingReply.audio && pendingReply.audio.includes('/replies/') && (

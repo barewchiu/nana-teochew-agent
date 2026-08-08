@@ -5,6 +5,7 @@ Used to improve LIVE chat when Whisper mishears dialect speech.
 
 from __future__ import annotations
 
+import json
 import re
 from typing import Any
 
@@ -395,6 +396,261 @@ def grounded_from_intent(intent_id: str, *, note_extra: str = "") -> dict[str, A
     if note_extra:
         note = f"{note}；{note_extra}"
     return {"intent": intent_id, "hits": 1, **INTENT_REPLIES[intent_id], "note": note}
+
+
+# P3：短多轮记忆 — 上一轮意图 + 短答续话
+INTENT_LABELS_ZH: dict[str, str] = {
+    "eat": "吃饭",
+    "meds": "吃药",
+    "miss_family": "想阿公",
+    "affection": "想念陪伴",
+    "thanks": "道谢",
+    "weather": "天气",
+    "opera": "潮剧",
+    "health": "身体",
+    "grandson": "孙子",
+}
+
+# last_intent → list of (keywords, reply_dict)
+FOLLOWUP_RULES: dict[str, list[tuple[tuple[str, ...], dict[str, str]]]] = {
+    "meds": [
+        (
+            ("食了", "吃了", "食咯", "有食", "食好", "吃好", "食完", "吃完"),
+            {
+                "reply": "好，阿嫲食药咯，真棒。记得多饮水，我陪您。",
+                "reply_zh": "好，奶奶吃药了，真棒。记得多喝水，我陪着您。",
+                "audio": "/audio/replies/meds.m4a",
+            },
+        ),
+        (
+            ("未食", "还没", "未吃", "冇食", "没有", "唔记得"),
+            {
+                "reply": "无要紧，阿嫲现在就食药，我陪您记着。",
+                "reply_zh": "没关系，奶奶现在就吃药，我帮您记着。",
+                "audio": "/audio/replies/meds.m4a",
+            },
+        ),
+    ],
+    "eat": [
+        (
+            ("食了", "吃了", "食饱", "饱了", "食咯"),
+            {
+                "reply": "好呀，食饱正有力气。阿嫲慢慢歇一下。",
+                "reply_zh": "好呀，吃饱才有力气。奶奶慢慢歇一会儿。",
+                "audio": "/audio/replies/eat.m4a",
+            },
+        ),
+        (
+            ("未食", "还没", "肚饿", "饿"),
+            {
+                "reply": "那阿嫲先食一点糜，唔好饿着。",
+                "reply_zh": "那奶奶先吃一点粥，别饿着。",
+                "audio": "/audio/replies/eat.m4a",
+            },
+        ),
+    ],
+    "weather": [
+        (
+            ("热", "好热", "热死"),
+            {
+                "reply": "热就少出门，在厝里吹风饮水，免中暑。",
+                "reply_zh": "热就少出门，在家里吹风喝水，别中暑。",
+                "audio": "/audio/replies/weather.m4a",
+            },
+        ),
+        (
+            ("冷", "好冷", "寒"),
+            {
+                "reply": "冷就加件衫，阿嫲勿着凉。",
+                "reply_zh": "冷就加件衣服，奶奶别着凉。",
+                "audio": "/audio/replies/weather.m4a",
+            },
+        ),
+        (
+            ("落雨", "下雨", "雨"),
+            {
+                "reply": "有雨就免出门，在厝里听戏也好。",
+                "reply_zh": "有雨就别出门，在家里听戏也好。",
+                "audio": "/audio/replies/weather.m4a",
+            },
+        ),
+    ],
+    "health": [
+        (
+            ("好了", "好些", "没事", "无事", "舒服"),
+            {
+                "reply": "那就好，阿嫲还是要歇一下，有事喊我。",
+                "reply_zh": "那就好，奶奶还是要歇一下，有事叫我。",
+                "audio": "/audio/replies/health.m4a",
+            },
+        ),
+        (
+            ("还痛", "痛", "难受", "要紧"),
+            {
+                "reply": "阿嫲若还难受，爱喊家里后生，我陪您。",
+                "reply_zh": "奶奶若还难受，要叫家里年轻人，我陪着您。",
+                "audio": "/audio/replies/health.m4a",
+            },
+        ),
+    ],
+    "miss_family": [
+        (
+            ("嗯", "好", "是", "哦", "想伊", "想啊"),
+            {
+                "reply": "阿嫲，我在这里陪您。想阿公就慢慢讲给我听。",
+                "reply_zh": "奶奶，我在这里陪您。想爷爷就慢慢讲给我听。",
+                "audio": "/audio/replies/miss_family.m4a",
+            },
+        ),
+    ],
+    "affection": [
+        (
+            ("嗯", "好", "是", "哦", "想你"),
+            {
+                "reply": "我也在，阿嫲。您再讲一句，我听着。",
+                "reply_zh": "我也在，奶奶。您再讲一句，我听着。",
+                "audio": "/audio/replies/thanks.m4a",
+            },
+        ),
+    ],
+    "opera": [
+        (
+            ("好", "想听", "开", "播"),
+            {
+                "reply": "好，阿嫲按绿色钮，我帮您开潮剧。",
+                "reply_zh": "好，奶奶按绿色按钮，我帮您打开潮剧。",
+                "audio": "/audio/replies/opera.m4a",
+            },
+        ),
+    ],
+    "grandson": [
+        (
+            ("好", "听", "留言", "返来"),
+            {
+                "reply": "好，阿嫲按蓝色钮「听孙子的信」就好。",
+                "reply_zh": "好，奶奶按蓝色按钮「听孙子的信」就行。",
+                "audio": "/audio/replies/grandson.m4a",
+            },
+        ),
+    ],
+    "thanks": [
+        (
+            ("嗯", "好", "是"),
+            {
+                "reply": "嗯，我一直在。阿嫲想讲什么都行。",
+                "reply_zh": "嗯，我一直在。奶奶想说什么都行。",
+                "audio": "/audio/replies/thanks.m4a",
+            },
+        ),
+    ],
+}
+
+# 极短附和：依赖上一轮话题
+SOFT_ACK_KEYS = ("好", "嗯", "是", "哦", "喔", "啊", "唔", "哎")
+
+
+def parse_chat_history(raw: Any) -> list[dict[str, str]]:
+    """Normalize history from JSON list or JSON string."""
+    data = raw
+    if isinstance(raw, str):
+        raw = raw.strip()
+        if not raw:
+            return []
+        try:
+            data = json.loads(raw)
+        except Exception:
+            return []
+    if not isinstance(data, list):
+        return []
+    out: list[dict[str, str]] = []
+    for item in data[-8:]:
+        if not isinstance(item, dict):
+            continue
+        role = str(item.get("role") or "").strip().lower()
+        if role in {"ai", "assistant", "bot"}:
+            role = "assistant"
+        if role not in {"user", "assistant"}:
+            continue
+        text = str(item.get("text") or item.get("content") or "").strip()
+        if not text:
+            continue
+        out.append(
+            {
+                "role": role,
+                "text": text,
+                "text_zh": str(item.get("text_zh") or item.get("translation") or "").strip(),
+                "intent": str(item.get("intent") or "").strip(),
+            }
+        )
+    return out
+
+
+def last_intent_from_history(history: list[dict[str, str]]) -> str:
+    for turn in reversed(history):
+        intent = (turn.get("intent") or "").strip()
+        if intent in INTENT_IDS:
+            return intent
+    return ""
+
+
+def memory_topic_label(intent_id: str) -> str:
+    return INTENT_LABELS_ZH.get(intent_id, "")
+
+
+def format_history_for_prompt(history: list[dict[str, str]], limit: int = 6) -> str:
+    lines = []
+    for turn in history[-limit:]:
+        who = "阿嫲" if turn.get("role") == "user" else "小管家"
+        zh = turn.get("text_zh") or ""
+        extra = f"（{zh}）" if zh and zh != turn.get("text") else ""
+        intent = turn.get("intent") or ""
+        tag = f"[{INTENT_LABELS_ZH.get(intent, intent)}]" if intent else ""
+        lines.append(f"{who}{tag}：{turn.get('text')}{extra}")
+    return "\n".join(lines)
+
+
+def match_followup(transcript: str, last_intent: str) -> dict[str, Any] | None:
+    """Resolve short continuations using previous turn intent."""
+    if not last_intent or last_intent not in FOLLOWUP_RULES:
+        return None
+    text = norm_text(transcript)
+    if not text:
+        return None
+
+    # Prefer specific keyword rules (short keys only on short utterances)
+    for keys, payload in FOLLOWUP_RULES[last_intent]:
+        for k in keys:
+            nk = norm_text(k)
+            if not nk or nk not in text:
+                continue
+            if len(nk) <= 2 and len(text) > len(nk) + 3:
+                continue
+            return {
+                "intent": last_intent,
+                "hits": 1,
+                "followup": True,
+                "reply": payload["reply"],
+                "reply_zh": payload["reply_zh"],
+                "audio": payload.get("audio") or "",
+                "note": f"多轮续话：承接「{INTENT_LABELS_ZH.get(last_intent, last_intent)}」",
+            }
+
+    # Soft ack only when utterance is very short
+    if len(text) <= 4 and any(
+        norm_text(k) == text or text == norm_text(k) for k in SOFT_ACK_KEYS
+    ):
+        soft = FOLLOWUP_RULES[last_intent][0][1]
+        label = INTENT_LABELS_ZH.get(last_intent, "刚才那事")
+        return {
+            "intent": last_intent,
+            "hits": 1,
+            "followup": True,
+            "reply": f"嗯，阿嫲，咱接着讲{label}。您慢慢说。",
+            "reply_zh": f"嗯，奶奶，咱们接着讲{label}。您慢慢说。",
+            "audio": soft.get("audio") or INTENT_REPLIES.get(last_intent, {}).get("audio") or "",
+            "note": f"多轮续话：短附和承接「{label}」",
+        }
+    return None
 
 
 def match_intent(transcript: str) -> dict[str, Any] | None:

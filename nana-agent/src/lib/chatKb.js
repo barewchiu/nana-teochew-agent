@@ -18,6 +18,11 @@ export const REPLY_VOICE_PACK = {
     reply: '阿公在天顶看着您，唔好哭，我陪您讲。',
     replyZh: '爷爷在天上看着您，别哭，我陪您说。',
   },
+  affection: {
+    audio: '/audio/replies/thanks.m4a',
+    reply: '阿嫲，我也想您啰，我在这里陪您，慢慢讲。',
+    replyZh: '奶奶，我也想您，我在这里陪您，慢慢说。',
+  },
   thanks: {
     audio: '/audio/replies/thanks.m4a',
     reply: '阿嫲，我在这里，随时听您讲话。',
@@ -94,6 +99,12 @@ export const CHAT_TURNS = [
     ...REPLY_VOICE_PACK.thanks,
     intent: 'thanks',
   },
+  {
+    recognized: '我想你',
+    recognizedZh: '我想你',
+    ...REPLY_VOICE_PACK.affection,
+    intent: 'affection',
+  },
 ];
 
 /** Map LIVE API audio / intent to voice-pack path */
@@ -106,6 +117,7 @@ export function resolveChatAudio({ audio, intent, reply } = {}) {
   if (/食饱|食糜|吃饭/.test(text)) return REPLY_VOICE_PACK.eat.audio;
   if (/食药|吃药/.test(text)) return REPLY_VOICE_PACK.meds.audio;
   if (/阿公|唔好哭/.test(text)) return REPLY_VOICE_PACK.miss_family.audio;
+  if (/我也想您|陪您/.test(text)) return REPLY_VOICE_PACK.affection.audio;
   if (/孙子|留言/.test(text)) return REPLY_VOICE_PACK.grandson.audio;
   if (/天时|天气|着凉/.test(text)) return REPLY_VOICE_PACK.weather.audio;
   if (/潮剧|开戏/.test(text)) return REPLY_VOICE_PACK.opera.audio;

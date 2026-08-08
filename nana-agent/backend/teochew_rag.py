@@ -18,16 +18,23 @@ def norm_text(s: str) -> str:
 # LIVE 实测 Whisper 乱码 / 近音 → (规范说法, 意图)
 # 来源：docs/LIVE测试错读记录.md（2026-08）
 MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
-    # weather
+    # weather — round1 + round2
     ("金力提示党意", "今日天气怎样", "weather"),
     ("金力提示", "今日天气怎样", "weather"),
     ("提示党意", "天气怎样", "weather"),
     ("党意", "天气", "weather"),
+    ("金质的天使祖年佬", "今日天气怎样", "weather"),
+    ("金质的天使", "今日天气怎样", "weather"),
+    ("天使祖年佬", "天气怎样", "weather"),
+    ("祖年佬", "天气", "weather"),
+    ("金质", "天气", "weather"),
     # thanks
     ("这一下了铺的瓦", "谢谢你陪我", "thanks"),
     ("一下了铺的瓦", "谢谢你陪我", "thanks"),
     ("铺的瓦", "谢谢", "thanks"),
     ("了铺的", "谢谢", "thanks"),
+    ("在下来陪我", "谢谢你陪我", "thanks"),
+    ("下来陪我", "谢谢你陪我", "thanks"),
     # health
     ("心態有地驚無所謀", "身体有点不舒服", "health"),
     ("心态有地惊无所谋", "身体有点不舒服", "health"),
@@ -48,19 +55,34 @@ MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
     ("聽著機", "听潮剧", "opera"),
     ("听着机", "听潮剧", "opera"),
     ("著機啊", "潮剧", "opera"),
-    # affection → miss_family / companionship
-    ("哇醒了了", "我想你", "miss_family"),
-    ("哇 醒了了", "我想你", "miss_family"),
-    ("醒了了", "我想你", "miss_family"),
-    ("哇咪花了", "我喜欢你", "miss_family"),
-    ("哇 咪花了", "我喜欢你", "miss_family"),
-    ("咪花了", "我喜欢你", "miss_family"),
-    # meds common dialect ASR drift
+    ("寻找来听着有机", "想听潮剧", "opera"),
+    ("听着有机", "想听潮剧", "opera"),
+    ("来听着有", "听潮剧", "opera"),
+    # affection（陪伴，勿走阿公回复）
+    ("哇醒了了", "我想你", "affection"),
+    ("哇!醒了!", "我想你", "affection"),
+    ("哇！醒了！", "我想你", "affection"),
+    ("哇 醒了了", "我想你", "affection"),
+    ("醒了了", "我想你", "affection"),
+    ("哇咪花了", "我喜欢你", "affection"),
+    ("哇 咪花了", "我喜欢你", "affection"),
+    ("咪花了", "我喜欢你", "affection"),
+    # eat
+    ("乐加饱味", "哩食饱未", "eat"),
+    ("加饱味", "食饱未", "eat"),
+    # meds — round2「阿玛就吃亚阿贝」
+    ("阿玛就吃亚阿贝", "阿嫲爱食药未", "meds"),
+    ("就吃亚阿贝", "食药未", "meds"),
+    ("吃亚阿贝", "食药", "meds"),
+    ("亚阿贝", "食药", "meds"),
+    ("阿玛就吃", "阿嫲食药", "meds"),
     ("食若", "食药", "meds"),
     ("食钥", "食药", "meds"),
     ("吃药未", "食药未", "meds"),
     ("爱食药", "食药", "meds"),
     # miss grandpa
+    ("金吉祥阿公了", "今日想阿公了", "miss_family"),
+    ("吉祥阿公", "想阿公", "miss_family"),
     ("想阿公", "今日想阿公了", "miss_family"),
     ("想阿公了", "今日想阿公了", "miss_family"),
 ]
@@ -107,7 +129,8 @@ def correct_mishear(transcript: str) -> dict[str, Any]:
 WHISPER_TEOCHEW_PROMPT = (
     "潮汕话日常。哩食饱未？阿嫲爱食药未？今日想阿公了。"
     "谢谢你陪我。今日天气怎样？想听潮剧。身体有点不舒服。"
-    "孙子有无返来？我想你。我喜欢你。食药、返来、天时、潮剧、阿嫲。"
+    "孙子有无返来？我想你。我喜欢你。"
+    "食药、吃药、返来、天时、天气、潮剧、阿嫲、阿公。"
 )
 
 
@@ -130,6 +153,8 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "晚饭",
             "食饱未",
             "哩食",
+            "乐加饱",
+            "加饱味",
         ),
     ),
     (
@@ -146,6 +171,10 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "食钥",
             "爱食药",
             "药未",
+            "阿玛就吃",
+            "吃亚阿贝",
+            "亚阿贝",
+            "阿贝",
         ),
     ),
     (
@@ -154,16 +183,25 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "想阿公",
             "想爷爷",
             "想孙",
-            "想你",
             "想伊",
             "孤单",
             "寂寞",
             "无人陪",
             "一个人",
             "阿公",
+            "金吉祥",
+        ),
+    ),
+    (
+        "affection",
+        (
+            "想你",
+            "我想你",
             "喜欢你",
+            "我喜欢你",
             "咪花",
             "醒了了",
+            "醒了",
         ),
     ),
     (
@@ -176,6 +214,7 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "麻烦你",
             "陪我",
             "铺的瓦",
+            "下来陪",
         ),
     ),
     (
@@ -193,6 +232,9 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "党意",
             "天时怎样",
             "天气怎样",
+            "金质",
+            "祖年佬",
+            "天使祖",
         ),
     ),
     (
@@ -209,6 +251,8 @@ INTENT_RULES: list[tuple[str, tuple[str, ...]]] = [
             "聽著機",
             "想听潮",
             "开戏",
+            "听着有机",
+            "寻找来听",
         ),
     ),
     (
@@ -254,6 +298,7 @@ INTENT_IDS = frozenset(
         "eat",
         "meds",
         "miss_family",
+        "affection",
         "thanks",
         "weather",
         "opera",
@@ -281,6 +326,13 @@ INTENT_REPLIES: dict[str, dict[str, str]] = {
         "reply_zh": "爷爷在天上看着您，别哭，我陪您说。",
         "audio": "/audio/replies/miss_family.m4a",
         "note": "乡音回复包：思念家人",
+    },
+    "affection": {
+        "reply": "阿嫲，我也想您啰，我在这里陪您，慢慢讲。",
+        "reply_zh": "奶奶，我也想您，我在这里陪您，慢慢说。",
+        # 暂复用陪伴原声；可另录 affection.m4a 覆盖
+        "audio": "/audio/replies/thanks.m4a",
+        "note": "乡音回复包：想念/喜欢（暂用 thanks 原声）",
     },
     "thanks": {
         "reply": "阿嫲，我在这里，随时听您讲话。",

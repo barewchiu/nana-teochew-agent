@@ -264,10 +264,11 @@ INTENT_CLASSIFY_SYSTEM = """你是潮汕话陪护助手的「意图分类器」�
 
 只能从下列 id 中选一个（完全无关才选 none）：
 - eat：吃饭/食饱/饿
-- meds：吃药/食药
-- miss_family：想家人、想阿公、想你、喜欢你、孤单
+- meds：吃药/食药（乱码如「阿玛就吃亚阿贝」也算）
+- miss_family：想阿公、想爷爷、思念已故家人
+- affection：我想你、我喜欢你、想小管家陪（不要选 miss_family）
 - thanks：谢谢、多谢、有人陪
-- weather：天气、冷热、下雨
+- weather：天气、冷热、下雨（乱码如「金质的天使祖年佬」「金力提示党意」也算）
 - opera：潮剧、听戏、广播
 - health：身体不舒服、病痛
 - grandson：孙子、返来、回家、留言
@@ -275,7 +276,7 @@ INTENT_CLASSIFY_SYSTEM = """你是潮汕话陪护助手的「意图分类器」�
 
 严格只输出 JSON：
 {
-  "intent": "eat|meds|miss_family|thanks|weather|opera|health|grandson|none",
+  "intent": "eat|meds|miss_family|affection|thanks|weather|opera|health|grandson|none",
   "transcript_zh": "推断的通顺普通话意思",
   "confidence": "high|medium|low"
 }"""

@@ -6,17 +6,19 @@
 | --- | --- | --- |
 | **gold**（标注文本→意图） | **100%** (32/32) | 意图层上限；已补 `头壳痛` / `食了` 等关键词 |
 | **groq**（现网普通话 Whisper） | **40.6%** (13/32) | 潮语录音被听成乱码/普通话，基线偏低 |
-| **transformers** `panlr/whisper-finetune-teochew`（AutoDL T4） | **50.0%** (16/32) | 空转写 0；family1 11/16、family2 5/16；仍低于 70% 目标 |
+| **transformers** `panlr/whisper-finetune-teochew`（AutoDL T4） | **50.0%** (16/32) | 零样本；family1 11/16、family2 5/16 |
+| **transformers + L1 LoRA**（train=36，merged） | **84.4%** (27/32) | 空转写 0；已超 70% 目标；失败：health_02×2、opera_01×2、grandson_02→miss_family |
 
 报告文件在本地：`data/asr/eval_holdout/reports/`（不进 git）  
-最新 transformers：`holdout_transformers_20260809_004104.json`
+最新微调复测：`holdout_transformers_20260809_110641.json`  
+远端权重：`teochew-asr/checkpoints/l1_lora/merged`（在 AutoDL 盘，未进 git）
 
 ## 结论
 
 1. 产品意图层在金标文本上已通。  
 2. 现网 Groq 耳对这批真潮语录音不够用 → 必须上潮语 ASR。  
-3. 开源潮语 Whisper 零样本比 Groq **+9.4pt**，但离 **≥70%** 仍差一截；失败多为英文乱听 / 拼音（尤其 family2）。  
-4. 下一步：用 L1 非 holdout 约 36 条在 GPU 上 LoRA 微调，再复测同一 holdout（见 [ASR_微调_L1.md](./ASR_微调_L1.md)）。
+3. 开源潮语 Whisper 零样本 50% → **L1 LoRA 后 84.4%**（+34pt），闸门 ≥70% 已过。  
+4. 下一步：导出/部署 merged 到 `TEOCHEW_ASR_URL`（或云 GPU 推理）；补 `头壳痛`/`潮剧` 训练句；交卷演示仍以快捷钮兜底。
 
 ## 复现
 

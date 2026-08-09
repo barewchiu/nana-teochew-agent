@@ -16,7 +16,7 @@
 1. 产品意图层在金标文本上已通。  
 2. 现网 Groq 耳对这批真潮语录音不够用 → 必须上潮语 ASR。  
 3. 开源潮语 Whisper 零样本比 Groq **+9.4pt**，但离 **≥70%** 仍差一截；失败多为英文乱听 / 拼音（尤其 family2）。  
-4. 下一步：用 L1 非 holdout 约 36 条在 GPU 上微调，再复测同一 holdout。
+4. 下一步：用 L1 非 holdout 约 36 条在 GPU 上 LoRA 微调，再复测同一 holdout（见 [ASR_微调_L1.md](./ASR_微调_L1.md)）。
 
 ## 复现
 

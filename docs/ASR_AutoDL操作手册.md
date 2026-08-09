@@ -55,6 +55,6 @@ python teochew-asr/scripts/run_autodl_eval.py
 | 无 `python3` | 用 `/root/miniconda3/bin/python` |
 | 按量计费 | 评测完立刻 **关机** |
 
-## 下一步
+## 下一步：L1 微调
 
-L1 非 holdout 约 36 条微调同一模型，目标 holdout 意图准确率 **≥70%**。
+见 [ASR_微调_L1.md](./ASR_微调_L1.md)（`run_autodl_finetune.py` / `autodl_finetune.sh`）。

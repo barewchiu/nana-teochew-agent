@@ -22,7 +22,8 @@
 ## 可选
 
 - [x] 已补录 `public/audio/replies/affection.m4a`（「我也想您…」）  
-- 下一优先：准备提交材料 / Hirebox 交卷  
+- [x] holdout LoRA 乱听补丁：`cheng gong`→想阿公；`Do you love me more?`→谢谢你陪我  
+- 下一优先：Hirebox 交卷  
 
 ## 历史摘要
 

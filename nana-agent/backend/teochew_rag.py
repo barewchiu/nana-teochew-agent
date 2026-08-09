@@ -42,6 +42,10 @@ MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
     ("了铺的", "谢谢", "thanks"),
     ("在下来陪我", "谢谢你陪我", "thanks"),
     ("下来陪我", "谢谢你陪我", "thanks"),
+    # thanks — holdout LoRA 乱听（2026-08-09）
+    ("Do you love me more?", "谢谢你陪我", "thanks"),
+    ("Do you love me more", "谢谢你陪我", "thanks"),
+    ("doyoulovememore", "谢谢你陪我", "thanks"),
     # health
     ("心態有地驚無所謀", "身体有点不舒服", "health"),
     ("心态有地惊无所谋", "身体有点不舒服", "health"),
@@ -100,6 +104,9 @@ MISHEAR_CORRECTIONS: list[tuple[str, str, str]] = [
     ("吉祥阿公", "想阿公", "miss_family"),
     ("想阿公", "今日想阿公了", "miss_family"),
     ("想阿公了", "今日想阿公了", "miss_family"),
+    # miss grandpa — holdout LoRA 乱听（2026-08-09）
+    ("cheng gong", "想阿公", "miss_family"),
+    ("chenggong", "想阿公", "miss_family"),
 ]
 
 

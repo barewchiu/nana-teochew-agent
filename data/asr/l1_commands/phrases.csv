@@ -33,3 +33,8 @@ health_03,health,无要紧,没关系/没事,medium
 grandson_01,grandson,孙子有无返来？,孙子有没有回来？,high
 grandson_02,grandson,孙仔返来未？,孙子回来了吗？,high
 grandson_03,grandson,想听留言,想听留言,medium
+health_04,health,头壳痛,头疼,high
+health_05,health,头痛,头痛,high
+opera_04,opera,想听潮剧,想听潮剧,high
+opera_05,opera,开潮剧,打开潮剧,high
+grandson_04,grandson,孙仔返来未？,孙子回来了吗？,high

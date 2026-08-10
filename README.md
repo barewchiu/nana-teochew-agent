@@ -15,7 +15,8 @@ EazO 黑客松项目：**阿嫲的小管家（Nana Teochew Agent）**。
     └── asr/                    # 潮语 ASR 录音与标注（L1/L2/hold-out）
 ```
 
-潮语识别长期方案：[`docs/ASR_路线4_长期方案.md`](docs/ASR_路线4_长期方案.md) · 本周看板：[`docs/ASR_第0-2周看板.md`](docs/ASR_第0-2周看板.md)
+潮语识别长期方案：[`docs/ASR_路线4_长期方案.md`](docs/ASR_路线4_长期方案.md) · 本周看板：[`docs/ASR_第0-2周看板.md`](docs/ASR_第0-2周看板.md)  
+**从零到一复盘（推荐新会话先读）：** [`docs/制作复盘_从零到一.md`](docs/制作复盘_从零到一.md)
 
 ## 快速开始
 

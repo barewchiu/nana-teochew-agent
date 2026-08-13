@@ -5,6 +5,7 @@
 | 文件 | 说明 |
 | --- | --- |
 | [制作复盘_从零到一.md](./制作复盘_从零到一.md) | **总复盘**：从 Phase1→Pivot→P1–P4→交卷→ASR 微调全流程（后续 Agent 优先读） |
+| [总统杯_资产映射与英文提案大纲.md](./总统杯_资产映射与英文提案大纲.md) | **总统杯**：EazO 资产 → Digital Inclusion 英文提案/PPT/Demo 大纲 |
 | [Pivot_To_Nana_Agent.md](./Pivot_To_Nana_Agent.md) | 从乡音回响 → 小管家的转型 brief |
 | [Nana_Agent_实施指南.md](./Nana_Agent_实施指南.md) | UI/留言桥/潮剧分步实施参考 |
 | [乡音回复录音包.md](./乡音回复录音包.md) | 第一步：家人录潮语回复口播清单 |
